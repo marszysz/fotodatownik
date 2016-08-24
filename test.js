@@ -11,10 +11,9 @@ test('listFiles should return proper file list', t => {
 }); 
 
 // getEXIFdate
-test('getExifDate should return `date taken` of a jpg file', t => {
+test('getExifDate should pass `date taken` of a jpg file as an argument to callback', t => {
     main.getExifDate('testdir/1.jpg', (date) => {
         t.deepEqual(date, new Date(2011, 6, 1, 7, 7, 7))
     });
 });
-
-// test.todo ('write some tests');
+test.todo('getExifDate');

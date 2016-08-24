@@ -6,6 +6,8 @@ function listFiles (dir) {
 }
 
 function getExifDate (fileName, callback) {
+    // reads `date taken` from fileName and passes it to callback
+    // in the form of Date object, null if failed
     var fs = require('fs');
     fs.stat(fileName, function(error, stats) {
         // todo: make some idiot-proofing at opening file (file accesibility etc.)
