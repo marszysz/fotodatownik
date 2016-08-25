@@ -10,6 +10,11 @@ function getExifDate (fileName, callback) {
     // in the form of Date object, null if failed
     var fs = require('fs');
     fs.stat(fileName, function(error, stats) {
+        if (error) {
+            console.log('File ', fileName, ' inaccesible');
+            callback(null);
+            return null;
+        }
         // todo: make some idiot-proofing at opening file (file accesibility etc.)
         // the best method for an error seems to be null result and a notice to the console 
         fs.open(fileName, 'r', function(error, fileDescriptor) {
