@@ -11,21 +11,27 @@ test('listFiles should return proper file list', t => {
 }); 
 
 // getEXIFdate
-test('getExifDate should pass `date taken` of a jpg file as an argument to callback', t => {
+test.cb('getExifDate should pass `date taken` of a jpg file as an argument to callback', t => {
     main.getExifDate('testdir/1.jpg', date => {
-        t.deepEqual(date, new Date(2011, 6, 1, 7, 7, 7));
+        t.deepEqual(date, '2011:06:01 07:07:07');
+        t.end();
     });
 });
-test("getExifDate should pass null when it can't access a file", t => {
+test.cb("getExifDate should pass null when the file doesn't exist", t => {
     main.getExifDate('bla.blah', date => {
         t.is(date, null);
+        t.end();
     });
 });
-test("getExifDate should pass null when it can't access a file", t => {
-    main.getExifDate('testdir/c.jpg', date => {
+test.cb("getExifDate should pass null when the file can't be read", t => {
+    main.getExifDate('testdir/c.jpg', date => { // c.jpg is 0-byte file
         t.is(date, null);
+        t.end();
     });
+});
+test.cb("getExifDate should pass null when it can't access a file", t => {
     main.getExifDate('testdir/a.jpg', date => { //a.jpg is a file without read permission
         t.is(date, null);
+        t.end();
     });
 });

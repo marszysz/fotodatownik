@@ -15,17 +15,32 @@ function getExifDate (fileName, callback) {
             callback(null);
             return null;
         }
-        // todo: make some idiot-proofing at opening file (file accesibility etc.)
-        // the best method for an error seems to be null result and a notice to the console 
         fs.open(fileName, 'r', function(error, fileDescriptor) {
+            if (error) {
+                console.log('File ', fileName, ' inaccesible');
+                callback(null);
+                return null;
+            }
             var exifEnd = 65635; // the maximum position within the JPEG file where EXIF metadata block could reach
             var exifBuffer = Buffer.allocUnsafe(stats.size < exifEnd ? stats.size : exifEnd);
             fs.read(fileDescriptor, exifBuffer, 0, exifBuffer.length, 0, function(error, bytesRead, buffer) {
-                fs.close(fileDescriptor, (error) => console.log('Done with a file: ', fileName));
+                if (error) {
+                    console.log('Unable to read file: ', fileName);
+                    callback(null);
+                    return null;
+                }
                 var parser = require('exif-parser').create(buffer);
                 parser.enableImageSize(false);
+                parser.enableSimpleValues(false); // won't return proper Date with true as it should
                 var result = parser.parse();
+                if (!result.tags.DateTimeOriginal) {
+                    console.log('EXIF data unreadable in file: ', fileName);
+                    callback(null);
+                    return null;
+                }
+                fs.close(fileDescriptor, error => console.log('Done with a file: ', fileName));
                 callback(result.tags.DateTimeOriginal);
+                return result.tags.DateTimeOriginal;
             });
         });
     });
