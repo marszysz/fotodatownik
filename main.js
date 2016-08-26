@@ -1,8 +1,8 @@
 'use strict';
 const fs = require ('fs');
 
-function listFiles (dir) {
-    return fs.readdirSync (dir);
+function listFiles (dir, filterFunc) {
+    return fs.readdirSync(dir).filter(filterFunc);
 }
 
 function getExifDate (fileName, callback) {
@@ -50,4 +50,13 @@ function getExifDate (fileName, callback) {
             });
         });
     });
+}
+
+function fileDateMap(dir, fileArray) {
+    var out = {};
+    return fileArray.reduce((prev, current) => {
+        let filePath = dir + '/' + current;
+        getExifDate(filePath, date => {prev[current] = date;});
+        return prev; 
+    }, out );
 }
