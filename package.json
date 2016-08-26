@@ -21,6 +21,7 @@
     "extends": "plugin:ava/recommended"
   },
   "dependencies": {
-    "exif-parser": "^0.1.9"
+    "exif-parser": "^0.1.9",
+    "rewire": "^2.5.2"
   }
 }

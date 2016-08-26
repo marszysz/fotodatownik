@@ -3,41 +3,42 @@ import test from 'ava';
 // czy nie ma jakiejś sztuczki typu include, żeby nie trzeba było pisać `export` przed każdą funkcją?
 // jakieś coś, co by wrzucało treść modułu, nawet bezpośrednio luzem, w zasięg bieżącego skryptu...
 // nie działa: import {listFiles} from './main'; // może dlatego nie działa, że był jakiś problem z `export`?...
-const main = require('./main');
+const rewire = require('rewire');
+const main = rewire('./main');
 
-// trochę głupawy test, ale o trzeciej nad ranem nie miałem lepszego pomysłu
+var listFiles = main.__get__('listFiles');
 test('listFiles should return proper file list', t => {
-    t.deepEqual(main.listFiles('testdir'), ['1.jpg', 'a.jpg', 'b.jpg', 'c.jpg']);
+    t.deepEqual(listFiles('testdir'), ['1.jpg', 'a.jpg', 'b.jpg', 'c.jpg']);
 }); 
 
-// getEXIFdate
+var getExifDate = main.__get__('getExifDate');
 test.cb('getExifDate should pass `date taken` of a jpg file as an argument to callback', t => {
-    main.getExifDate('testdir/1.jpg', date => {
+    getExifDate('testdir/1.jpg', date => {
         t.deepEqual(date, new Date('2011-06-01T07:07:07.000Z'));
         t.end();
     });
 });
 test.cb("getExifDate should pass null when the file doesn't exist", t => {
-    main.getExifDate('bla.blah', date => {
+    getExifDate('bla.blah', date => {
         t.is(date, null);
         t.end();
     });
 });
 test.cb("getExifDate should pass null when the file can't be read", t => {
-    main.getExifDate('testdir/c.jpg', date => { // c.jpg is 0-byte file
+    getExifDate('testdir/c.jpg', date => { // c.jpg is 0-byte file
         t.is(date, null);
         t.end();
     });
 });
 test.cb("getExifDate should pass null when it can't access a file", t => {
-    main.getExifDate('testdir/a.jpg', date => { //a.jpg is a file without read permission
+    getExifDate('testdir/a.jpg', date => { //a.jpg is a file without read permission
         t.is(date, null);
         t.end();
     });
 });
 
 test.cb("getExifDate should pass null when the file doesn't contain valid Date field", t => {
-    main.getExifDate('testdir/b.jpg', date => { //b.jpg is a file without read permission
+    getExifDate('testdir/b.jpg', date => { //b.jpg is a file without read permission
         t.is(date, null);
         t.end();
     });

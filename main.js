@@ -51,7 +51,3 @@ function getExifDate (fileName, callback) {
         });
     });
 }
-
-// exports for the unit tests
-exports.listFiles = listFiles;
-exports.getExifDate = getExifDate;
