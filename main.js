@@ -31,16 +31,22 @@ function getExifDate (fileName, callback) {
                 }
                 var parser = require('exif-parser').create(buffer);
                 parser.enableImageSize(false);
-                parser.enableSimpleValues(false); // won't return proper Date with true as it should
-                var result = parser.parse();
-                if (!result.tags.DateTimeOriginal) {
-                    console.log('EXIF data unreadable in file: ', fileName);
-                    callback(null);
-                    return null;
+                parser.enableSimpleValues(true); // returns UNIX timestamp w. this flag (raw string otherwise)
+                var result;
+                try {
+                    result = parser.parse();
                 }
-                fs.close(fileDescriptor, error => console.log('Done with a file: ', fileName));
-                callback(result.tags.DateTimeOriginal);
-                return result.tags.DateTimeOriginal;
+                catch (err) {}
+                var exifDate = result && result.tags.DateTimeOriginal ? new Date(result.tags.DateTimeOriginal * 1000) : null;
+                if (!exifDate) {
+                    var msg = 'EXIF date not present or EXIF unreadable in file: ';
+                }
+                else {
+                    var msg = 'Done with a file: ';
+                }
+                fs.close(fileDescriptor, error => console.log(msg + fileName));
+                callback(exifDate);
+                return exifDate;
             });
         });
     });

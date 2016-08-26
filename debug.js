@@ -1,4 +1,4 @@
 'use strict';
 const main = require('./main');
 
-main.getExifDate('testdir/c.jpg', console.log.bind(console));
+main.getExifDate('testdir/1.jpg', console.log.bind(console));
