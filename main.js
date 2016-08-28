@@ -53,10 +53,16 @@ function getExifDate (fileName, callback) {
 }
 
 function fileDateMap(dir, fileArray) {
+    // returns an object which maps filenames
+    // from fileArray located in dir to their EXIF DateCreated dates
+    // won't work because of improper mix od sync and async
+    // todo: rewrite this (to be fully async?)
     var out = {};
     return fileArray.reduce((prev, current) => {
-        let filePath = dir + '/' + current;
-        getExifDate(filePath, date => {prev[current] = date;});
+        var filePath = dir + '/' + current;
+        getExifDate(filePath, date => {
+            prev[current] = date;
+        });
         return prev; 
     }, out );
 }
