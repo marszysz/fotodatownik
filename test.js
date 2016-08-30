@@ -42,7 +42,10 @@ test.cb("getExifDate should pass null when the file doesn't contain valid Date f
 });
 
 var fileDateMap = main.__get__('fileDateMap');
-test.failing('fileDateMap should return an object which maps filenames to dates', t => {
-    t.deepEqual(fileDateMap('testdir', ['1.jpg', 'b.jpg', 'bla.blah']), 
-        {'1.jpg': new Date('2011-06-01T07:07:07.000Z'), 'b.jpg': null, 'bla.blah': null});
+test.cb('fileDateMap should return an object which maps filenames to dates', t => {
+    fileDateMap('testdir', ['1.jpg', 'b.jpg', 'bla.blah'], result => {
+        var expected = {'baseDir':'testdir', '1.jpg': new Date('2011-06-01T07:07:07.000Z'), 'b.jpg': null, 'bla.blah': null};
+        t.deepEqual(result, expected);
+        t.end();
+    });
 });
