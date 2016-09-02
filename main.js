@@ -9,7 +9,7 @@ function getExifDate (fileName, callback) {
     // reads `date taken` from fileName and passes it to callback
     // in the form of Date object, null if failed.
     // Uses UTC since no timezone is available in DateTimeOriginal tag.
-     
+
     var fs = require('fs');
     fs.stat(fileName, processFile);
 
@@ -84,3 +84,32 @@ function fileDateMap (dir, fileArray, callback) {
     }
 }
 
+function makeNewFileName(oldFileName, fileDate, options) {
+    // Composes a new file name from the old one, a date object and options object
+    return null;
+}
+
+function extractTitle(fileName) {
+    // extracts and returns file/dir title from a given file name, if there is one, empty string otherwise
+
+    /* from DCF specification: 
+    Subdirectory names (such as "123ABCDE") consist of a unique directory number (in the range 100…999)
+    and five alphanumeric characters, which may be freely chosen.
+    These directories contain files with names such as "ABCD1234.JPG"
+    that consist of four alphanumeric characters (often "DSC_", "DSC0", "DSCF", "IMG_"/"MOV_", or "P000"),
+    followed by a number.
+    The file extension is "JPG" for Exif files and "THM" for Exif files that represent thumbnails of other files than "JPG".
+    */
+
+    var pattern = /^((\w{4}\d+)|(\d{3}\w{5}))?(.*?)(\.\w+)?$/; // 4th subexpr contains user-added title
+    try {
+        var result = pattern.exec(fileName)[4].trim();
+    }
+    catch (err) {
+        var result = '';
+    }
+
+    return result;
+}
+
+// todo: what about *.thm files and asociated objects, especially videos?
