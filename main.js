@@ -7,7 +7,9 @@ function listFiles (dir, filterFunc) {
 
 function getExifDate (fileName, callback) {
     // reads `date taken` from fileName and passes it to callback
-    // in the form of Date object, null if failed
+    // in the form of Date object, null if failed.
+    // Uses UTC since no timezone is available in DateTimeOriginal tag.
+     
     var fs = require('fs');
     fs.stat(fileName, processFile);
 
@@ -81,3 +83,4 @@ function fileDateMap (dir, fileArray, callback) {
         }
     }
 }
+
