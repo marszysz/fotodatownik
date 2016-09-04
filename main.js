@@ -67,7 +67,7 @@ function fileDateMap (dir, fileArray, callback) {
     // from fileArray located in dir to their EXIF DateCreated dates
     var result = {};
     result.filesPending = fileArray.length;
-    result.baseDir = dir;
+    Object.defineProperty(result, 'baseDir', {value: dir});
     fileArray.forEach(gatherDates);
   
     function gatherDates (fileName) {
@@ -84,7 +84,7 @@ function fileDateMap (dir, fileArray, callback) {
     }
 }
 
-function makeNewFileName(oldFileName, fileDate, options) {
+function makeNewFileName (oldFileName, fileDate, options) {
     /* Composes a new file name from the old one, a date object and options object.
     options with defaults:
     dateSeparator: '.'  - separator of date parts
@@ -110,7 +110,7 @@ function makeNewFileName(oldFileName, fileDate, options) {
     return datePart + extractTitle(oldFileName);
 }
 
-function extractTitle(fileName) {
+function extractTitle (fileName) {
     // Extracts and returns file/dir title from a given file/dir name, if there is one,
     // empty string otherwise. The title is everything after: the standard filename
     // (without extension) given by the DCF compliant camera, a date or date range.
@@ -128,6 +128,22 @@ function extractTitle(fileName) {
     return fileName.replace(pattern, '');
 }
 
-
+function fileRenameMap (dir, filterFunc, options, callback) {
+    // Calls callback with generated object which maps filenames to their new names.
+    // Takes a directory name, filename filter function and options object for makeNewFileName.  
+    var fileList = listFiles(dir, filterFunc);
+    fileDateMap(dir, fileList, {}, genRenameMap);
+    
+    function genRenameMap (dateMap) {
+        var result = {pending: Object.keys(dateMap).length};
+        Object.keys(dateMap).map(fileName => { // to be refactored as more pure
+            result[fileName] = makeNewFileName(fileName, dateMap[fileName], options);
+            if(--result.pending === 0) {
+                delete result.pending;
+                callback(result);
+            }
+        });
+    }
+}
 
 // todo: what about *.thm files and asociated objects, especially videos?

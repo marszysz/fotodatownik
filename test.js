@@ -72,13 +72,16 @@ test('makeNewFileName should compose a new file name based on the old name, file
     t.is(makeNewFileName('DCIM1234 sth.jpg', new Date('2016-01-01T00:00:00.999Z'), opts), '20160101_00:00:00 sth.jpg');
 });
 
-var getFileRenameMap = main.__get__('getFileRenameMap');
-test('getFileRenameMap should return an object which maps existing filenames to new ones', t => {
-    let expected = {
+var fileRenameMap = main.__get__('fileRenameMap');
+test.cb('fileRenameMap should return an object which maps existing filenames to new ones', t => {
+    var expected = {
         'baseDir': 'testdir',
         '1.jpg': '2011.06.01_07.07.07.jpg',
         'b.jpg': null,
         'not/existing': null
     }
-    t.deepEqual(getFileRenameMap('testdir', fn => /\.jpe?g$/i.test(fn)), expected);
+    fileRenameMap('testdir', fn => /\.jpe?g$/i.test(fn), {}, result => {
+        t.deepEqual(result, expected);
+        t.end;
+    });
 });
