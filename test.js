@@ -16,7 +16,7 @@ test.cb('getExifDate should pass `date taken` of a jpg file as an argument to ca
     });
 });
 test.cb("getExifDate should pass null when the file doesn't exist", t => {
-    getExifDate('bla.blah', date => { // bla.blah is a non-existent file
+    getExifDate('not/existing', date => {
         t.is(date, null);
         t.end();
     });
@@ -43,8 +43,8 @@ test.cb("getExifDate should pass null when the file doesn't contain valid Date f
 
 var fileDateMap = main.__get__('fileDateMap');
 test.cb('fileDateMap should return an object which maps filenames to dates', t => {
-    fileDateMap('testdir', ['1.jpg', 'b.jpg', 'bla.blah'], result => {
-        var expected = {'baseDir':'testdir', '1.jpg': new Date('2011-06-01T07:07:07.000Z'), 'b.jpg': null, 'bla.blah': null};
+    fileDateMap('testdir', ['1.jpg', 'b.jpg', 'not/existing'], result => {
+        let expected = {'baseDir':'testdir', '1.jpg': new Date('2011-06-01T07:07:07.000Z'), 'b.jpg': null, 'not/existing': null};
         t.deepEqual(result, expected);
         t.end();
     });
@@ -58,7 +58,7 @@ test('extractTitle should return a title (including file extension) extracted fr
     t.is(extractTitle('105NIKON an extraordinarily nice event'), ' an extraordinarily nice event');
     t.is(extractTitle('bździągwa'), 'bździągwa');
     t.is(extractTitle('IMG_1234.jpg'), '.jpg');
-})
+});
 
 var makeNewFileName = main.__get__('makeNewFileName');
 test('makeNewFileName should compose a new file name based on the old name, file date and options', t => {
@@ -70,5 +70,15 @@ test('makeNewFileName should compose a new file name based on the old name, file
         dateTimeSeparator: '_'
     };
     t.is(makeNewFileName('DCIM1234 sth.jpg', new Date('2016-01-01T00:00:00.999Z'), opts), '20160101_00:00:00 sth.jpg');
-})
+});
 
+var getFileRenameMap = main.__get__('getFileRenameMap');
+test('getFileRenameMap should return an object which maps existing filenames to new ones', t => {
+    let expected = {
+        'baseDir': 'testdir',
+        '1.jpg': '2011.06.01_07.07.07.jpg',
+        'b.jpg': null,
+        'not/existing': null
+    }
+    t.deepEqual(getFileRenameMap('testdir', fn => /\.jpe?g$/i.test(fn)), expected);
+});
