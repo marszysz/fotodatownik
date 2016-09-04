@@ -5,7 +5,6 @@
   },
   "env": {  //enabled environments
     "node": true,
-    "browser": true,
     "es6": true
   },
   "globals": {
@@ -16,8 +15,7 @@
     //enable ESLint rules
     "quotes": [2, "single", {"avoidEscape": true, "allowTemplateLiterals": false}],
     "eqeqeq": [1, "smart"],
-    "brace-style": [2, "stroustrup"],
-    "curly": [2, "all"],
+    "curly": [2, "multi-line", "consistent"],
     "eol-last": 0,
     "no-nested-ternary": 1,
     "padded-blocks": [1, "never"],
