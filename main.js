@@ -85,14 +85,37 @@ function fileDateMap (dir, fileArray, callback) {
 }
 
 function makeNewFileName(oldFileName, fileDate, options) {
-    // Composes a new file name from the old one, a date object and options object
-    return null;
+    /* Composes a new file name from the old one, a date object and options object.
+    options with defaults:
+    dateSeparator: '.'  - separator of date parts
+    timeSeparator: '.'  - separator of time parts
+    dateTimeSeparator: '-'  - separates date from time
+    */
+    var ds = options.hasOwnProperty('dateSeparator') ? options.dateSeparator : '.';
+    var ts = options.hasOwnProperty('timeSeparator') ? options.timeSeparator : '.';
+    var dts = options.hasOwnProperty('dateTimeSeparator') ? options.dateTimeSeparator : '-';
+
+    function fillTo2 (nr) {
+        nr += '';
+        if(nr.length < 2) nr = '0' + nr;
+        return nr;
+    }
+    var y = fileDate.getUTCFullYear();
+    var m = fillTo2(fileDate.getUTCMonth() + 1);  // strange JS month handling (0-11)
+    var d = fillTo2(fileDate.getUTCDate());
+    var h = fillTo2(fileDate.getUTCHours());
+    var M = fillTo2(fileDate.getUTCMinutes());
+    var s = fillTo2(fileDate.getUTCSeconds());
+    var datePart = [y, ds, m, ds, d, dts, h, ts, M, ts, s].join('');
+    return datePart + extractTitle(oldFileName);
 }
 
 function extractTitle(fileName) {
-    // extracts and returns file/dir title from a given file name, if there is one, empty string otherwise
+    // Extracts and returns file/dir title from a given file/dir name, if there is one,
+    // empty string otherwise. The title is everything after: the standard filename
+    // (without extension) given by the DCF compliant camera, a date or date range.
 
-    /* from DCF specification: 
+    /* from Wikipedia on DCF specification: 
     Subdirectory names (such as "123ABCDE") consist of a unique directory number (in the range 100…999)
     and five alphanumeric characters, which may be freely chosen.
     These directories contain files with names such as "ABCD1234.JPG"
@@ -101,15 +124,10 @@ function extractTitle(fileName) {
     The file extension is "JPG" for Exif files and "THM" for Exif files that represent thumbnails of other files than "JPG".
     */
 
-    var pattern = /^((\w{4}\d+)|(\d{3}\w{5}))?(.*?)(\.\w+)?$/; // 4th subexpr contains user-added title
-    try {
-        var result = pattern.exec(fileName)[4].trim();
-    }
-    catch (err) {
-        var result = '';
-    }
-
-    return result;
+    var pattern = /^\w{4}\d+|\d{3}\w{5}|\d{4}\W?\d\d\W?\d\d(-(((\d{4}\W?)?\d\d\W?)?\d\d))?/;
+    return fileName.replace(pattern, '');
 }
+
+
 
 // todo: what about *.thm files and asociated objects, especially videos?

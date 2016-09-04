@@ -50,18 +50,25 @@ test.cb('fileDateMap should return an object which maps filenames to dates', t =
     });
 });
 
-var makeNewFileName = main.__get__('makeNewFileName');
-test.skip('makeNewFileName should compose a new file name based on the old name, file date and options', t => {
-    let opts = {};
-    t.is(makeNewFileName('DCIM1234.jpg', new Date('2016-01-01T00:00:00.000Z'), opts), '2016.01.01-00.00.00');
+var extractTitle = main.__get__('extractTitle');
+test('extractTitle should return a title (including file extension) extracted from file name', t => {
+    t.is(extractTitle('DSCF1234 some fancy title eg. żółć.jpg'), ' some fancy title eg. żółć.jpg');
+    t.is(extractTitle('DSCF0000 - sth.JPG'), ' - sth.JPG');
+    t.is(extractTitle('Hi guys.JPG'), 'Hi guys.JPG');
+    t.is(extractTitle('105NIKON an extraordinarily nice event'), ' an extraordinarily nice event');
+    t.is(extractTitle('bździągwa'), 'bździągwa');
+    t.is(extractTitle('IMG_1234.jpg'), '.jpg');
 })
 
-var extractTitle = main.__get__('extractTitle');
-test('extractTitle should return a title extracted from file name', t => {
-    t.is(extractTitle('DSCF1234 some fancy title eg. żółć.jpg'), 'some fancy title eg. żółć');
-    t.is(extractTitle('DSCF0000 - sth.JPG'), '- sth');
-    t.is(extractTitle('Hi guys.JPG'), 'Hi guys');
-    t.is(extractTitle('105NIKON an extraordinarily nice event'), 'an extraordinarily nice event');
-    t.is(extractTitle('bździągwa'), 'bździągwa');
-    t.is(extractTitle('DCIM1234.JPG'), '', 'no title should give empty string');
+var makeNewFileName = main.__get__('makeNewFileName');
+test('makeNewFileName should compose a new file name based on the old name, file date and options', t => {
+    t.is(makeNewFileName('DCIM1234.jpg', new Date('2016-01-01T00:00:00.000Z'), {}), '2016.01.01-00.00.00.jpg');
+    t.is(makeNewFileName('DCIM1234 bździąg wa.JPG', new Date('2016-02-02T23:59:59Z'), {}), '2016.02.02-23.59.59 bździąg wa.JPG');
+    let opts = {
+        dateSeparator: '',
+        timeSeparator: ':',
+        dateTimeSeparator: '_'
+    };
+    t.is(makeNewFileName('DCIM1234 sth.jpg', new Date('2016-01-01T00:00:00.999Z'), opts), '20160101_00:00:00 sth.jpg');
 })
+
