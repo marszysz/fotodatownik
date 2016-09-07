@@ -75,7 +75,7 @@ test('makeNewFileName should compose a new file name based on the old name, file
 });
 
 var fileRenameMap = main.__get__('fileRenameMap');
-test.cb('fileRenameMap should return an object which maps existing filenames to new ones', t => {
+test.cb('fileRenameMap should pass an object which maps existing filenames to new ones', t => {
     var expected = {
         '1.jpg': '2011.06.01_07.07.07 1.jpg',
         'c.jpg': null,
