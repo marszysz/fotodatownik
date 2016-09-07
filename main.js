@@ -160,4 +160,8 @@ function fileRenameMap (dir, filterFunc, options, callback) {
     }
 }
 
+function extractDirDateRange (dir, callback) {
+    callback(null);
+}
+
 // todo: what about *.thm files and asociated objects, especially videos?

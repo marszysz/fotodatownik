@@ -85,3 +85,11 @@ test.cb('fileRenameMap should pass an object which maps existing filenames to ne
         t.end();
     });
 });
+
+var extractDirDateRange = main.__get__('extractDirDateRange');
+test.cb("extractDirDateRange should pass null if a given directory doesn't contain jpeg files with EXIF dates", t => {
+    extractDirDateRange('testdir/empty', result => {
+        t.is(result, null);
+        t.end();
+    });
+});
