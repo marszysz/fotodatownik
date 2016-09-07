@@ -44,7 +44,7 @@ test.cb("getExifDate should pass null when the file doesn't contain valid Date f
 var fileDateMap = main.__get__('fileDateMap');
 test.cb('fileDateMap should return an object which maps filenames to dates', t => {
     fileDateMap('testdir', ['1.jpg', 'b.jpg', 'not/existing'], result => {
-        let expected = {'baseDir':'testdir', '1.jpg': new Date('2011-06-01T07:07:07.000Z'), 'b.jpg': null, 'not/existing': null};
+        let expected = {'1.jpg': new Date('2011-06-01T07:07:07.000Z'), 'b.jpg': null, 'not/existing': null};
         t.deepEqual(result, expected);
         t.end();
     });
@@ -58,30 +58,30 @@ test('extractTitle should return a title (including file extension) extracted fr
     t.is(extractTitle('105NIKON an extraordinarily nice event'), ' an extraordinarily nice event');
     t.is(extractTitle('bździągwa'), 'bździągwa');
     t.is(extractTitle('IMG_1234.jpg'), '.jpg');
+    t.is(extractTitle('1.jpg'), '1.jpg');
 });
 
 var makeNewFileName = main.__get__('makeNewFileName');
 test('makeNewFileName should compose a new file name based on the old name, file date and options', t => {
-    t.is(makeNewFileName('DCIM1234.jpg', new Date('2016-01-01T00:00:00.000Z'), {}), '2016.01.01-00.00.00.jpg');
-    t.is(makeNewFileName('DCIM1234 bździąg wa.JPG', new Date('2016-02-02T23:59:59Z'), {}), '2016.02.02-23.59.59 bździąg wa.JPG');
+    t.is(makeNewFileName('DCIM1234.jpg', new Date('2016-01-01T00:00:00.000Z'), {}), '2016.01.01_00.00.00.jpg');
+    t.is(makeNewFileName('blah.jpg', new Date('2016-01-01T00:00:00.000Z'), {}), '2016.01.01_00.00.00 blah.jpg');
+    t.is(makeNewFileName('DCIM1234 bździąg wa.JPG', new Date('2016-02-02T23:59:59Z'), {}), '2016.02.02_23.59.59 bździąg wa.JPG');
     let opts = {
         dateSeparator: '',
         timeSeparator: ':',
-        dateTimeSeparator: '_'
+        dateTimeSeparator: '-'
     };
-    t.is(makeNewFileName('DCIM1234 sth.jpg', new Date('2016-01-01T00:00:00.999Z'), opts), '20160101_00:00:00 sth.jpg');
+    t.is(makeNewFileName('DCIM1234 sth.jpg', new Date('2016-01-01T00:00:00.999Z'), opts), '20160101-00:00:00 sth.jpg');
 });
 
 var fileRenameMap = main.__get__('fileRenameMap');
 test.cb('fileRenameMap should return an object which maps existing filenames to new ones', t => {
     var expected = {
-        'baseDir': 'testdir',
-        '1.jpg': '2011.06.01_07.07.07.jpg',
-        'b.jpg': null,
-        'not/existing': null
+        '1.jpg': '2011.06.01_07.07.07 1.jpg',
+        'c.jpg': null,
     }
-    fileRenameMap('testdir', fn => /\.jpe?g$/i.test(fn), {}, result => {
+    fileRenameMap('testdir', fn => /^[1c]\.jpg$/.test(fn), {}, result => {
         t.deepEqual(result, expected);
-        t.end;
+        t.end();
     });
 });

@@ -10,6 +10,8 @@ function getExifDate (fileName, callback) {
     // in the form of Date object, null if failed.
     // Uses UTC since no timezone is available in DateTimeOriginal tag.
 
+    if(!callback) throw 'Empty callback';
+
     var fs = require('fs');
     fs.stat(fileName, processFile);
 
@@ -65,6 +67,7 @@ function getExifDate (fileName, callback) {
 function fileDateMap (dir, fileArray, callback) {
     // calls the callback with an object which maps filenames
     // from fileArray located in dir to their EXIF DateCreated dates
+    if(!callback) throw 'Empty callback';
     var result = {};
     result.filesPending = fileArray.length;
     Object.defineProperty(result, 'baseDir', {value: dir});
@@ -89,11 +92,11 @@ function makeNewFileName (oldFileName, fileDate, options) {
     options with defaults:
     dateSeparator: '.'  - separator of date parts
     timeSeparator: '.'  - separator of time parts
-    dateTimeSeparator: '-'  - separates date from time
+    dateTimeSeparator: '_'  - separates date from time
     */
     var ds = options.hasOwnProperty('dateSeparator') ? options.dateSeparator : '.';
     var ts = options.hasOwnProperty('timeSeparator') ? options.timeSeparator : '.';
-    var dts = options.hasOwnProperty('dateTimeSeparator') ? options.dateTimeSeparator : '-';
+    var dts = options.hasOwnProperty('dateTimeSeparator') ? options.dateTimeSeparator : '_';
 
     function fillTo2 (nr) {
         nr += '';
@@ -107,7 +110,13 @@ function makeNewFileName (oldFileName, fileDate, options) {
     var M = fillTo2(fileDate.getUTCMinutes());
     var s = fillTo2(fileDate.getUTCSeconds());
     var datePart = [y, ds, m, ds, d, dts, h, ts, M, ts, s].join('');
-    return datePart + extractTitle(oldFileName);
+    var title = extractTitle(oldFileName);
+    // if the title starts with a letter or number, direct appending to the date would be unpleasant
+    // (this method is Unicode-safe)
+    if(title[0].toLowerCase() !== title[0].toUpperCase() || /\d/.test(title[0])) {
+        title = ' ' + title;
+    }
+    return datePart + title;
 }
 
 function extractTitle (fileName) {
@@ -121,7 +130,8 @@ function extractTitle (fileName) {
     These directories contain files with names such as "ABCD1234.JPG"
     that consist of four alphanumeric characters (often "DSC_", "DSC0", "DSCF", "IMG_"/"MOV_", or "P000"),
     followed by a number.
-    The file extension is "JPG" for Exif files and "THM" for Exif files that represent thumbnails of other files than "JPG".
+    The file extension is "JPG" for Exif files and "THM" for Exif files that represent thumbnails
+    of other files than "JPG".
     */
 
     var pattern = /^\w{4}\d+|\d{3}\w{5}|\d{4}\W?\d\d\W?\d\d(-(((\d{4}\W?)?\d\d\W?)?\d\d))?/;
@@ -131,18 +141,22 @@ function extractTitle (fileName) {
 function fileRenameMap (dir, filterFunc, options, callback) {
     // Calls callback with generated object which maps filenames to their new names.
     // Takes a directory name, filename filter function and options object for makeNewFileName.  
+
+    if(!callback) throw 'Empty callback';
+
     var fileList = listFiles(dir, filterFunc);
-    fileDateMap(dir, fileList, {}, genRenameMap);
+    fileDateMap(dir, fileList, generateRenameMap);
     
-    function genRenameMap (dateMap) {
-        var result = {pending: Object.keys(dateMap).length};
-        Object.keys(dateMap).map(fileName => { // to be refactored as more pure
-            result[fileName] = makeNewFileName(fileName, dateMap[fileName], options);
-            if(--result.pending === 0) {
-                delete result.pending;
-                callback(result);
+    function generateRenameMap (dateMap) {
+        var result = {};
+        Object.keys(dateMap).forEach(fileName => {
+            if(dateMap[fileName]) {
+                result[fileName] = makeNewFileName(fileName, dateMap[fileName], options);
+            } else {
+                result[fileName] = null;
             }
         });
+        callback(result);
     }
 }
 
