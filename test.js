@@ -87,9 +87,16 @@ test.cb('fileRenameMap should pass an object which maps existing filenames to ne
 });
 
 var extractDirDateRange = main.__get__('extractDirDateRange');
-test.cb("extractDirDateRange should pass null if a given directory doesn't contain jpeg files with EXIF dates", t => {
-    extractDirDateRange('testdir/empty', result => {
+test.cb("extractDirDateRange should pass null if a given directory doesn't contain jpeg files with EXIF dates \
+    or isn't accesible.", t => {
+    extractDirDateRange('testdir/empty', fn => true, result => {
         t.is(result, null);
+        t.end();
+    });
+});
+test.cb('extractDirDateRange should pass an array of [min_date max_date]', t => {
+    extractDirDateRange('testdir/100TEST_', fn => /\.jpe?g$/i.test(fn), result => {
+        t.is(result, [new Date(), new Date()]);
         t.end();
     });
 });

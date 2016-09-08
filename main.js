@@ -160,8 +160,31 @@ function fileRenameMap (dir, filterFunc, options, callback) {
     }
 }
 
-function extractDirDateRange (dir, callback) {
-    callback(null);
+function extractDirDateRange (dir, filterFunc, callback) {
+    var fileList = null;
+    try {
+        fileList = listFiles(dir, filterFunc);
+    } catch (err) {
+        console.log('Error opening directory ', dir, ' - ', err)
+    };
+    if(! fileList) {
+        callback(null);
+    } else {
+        var dateList = [];
+        var filesPending = fileList.length;
+        fileList.forEach(collectDate);
+    };
+
+    function collectDate (fileName) {
+        getExifDate(dir + '/' + fileName, date => {
+            dateList.push(date);
+            if(--filesPending === 0) handleDateList(dateList);
+        });
+    };
+    function handleDateList (dateList) {
+        var dateListSorted = dateList.slice().sort();
+        callback(dateListSorted.splice(1, dateList.length - 2)); // sth wrong with the splice
+    }
 }
 
 // todo: what about *.thm files and asociated objects, especially videos?
