@@ -100,3 +100,15 @@ test.cb('extractDirDateRange should pass an array of [min_date max_date]', t => 
         t.end();
     });
 });
+test.cb('extractDirDateRange should pass an array of 2 dates even if dir has 1 file', t => {
+    extractDirDateRange('testdir/100TEST_', fn => fn === '1.jpg', result => {
+        t.deepEqual(result, [new Date('2011-06-01T07:07:07.000Z'), new Date('2011-06-01T07:07:07.000Z')]);
+        t.end();
+    });
+});
+test.cb("extractDirDateRange should pass null if it doesn't have any files to work on", t => {
+    extractDirDateRange('testdir/100TEST_', fn => false, result => {
+        t.deepEqual(result, null);
+        t.end();
+    });
+});

@@ -183,7 +183,16 @@ function extractDirDateRange (dir, filterFunc, callback) {
         });
     };
     function handleDateList (dateList) {
-        var dateListSorted = dateList.slice().sort((date1, date2) => date1 - date2);
+        if(! dateList) {
+            console.log(dir + ' does not contain any file to read.')
+            callback(null);
+        }
+        var dateListSorted;
+        if(dateList.length === 1) {
+            dateListSorted = dateList.concat(dateList);
+        } else {
+            dateListSorted = dateList.slice().sort((date1, date2) => date1 - date2);
+        };
         var out;
         if(dateList.length > 2) {
             out = dateListSorted.splice(1, dateList.length - 2);
