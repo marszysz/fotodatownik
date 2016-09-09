@@ -96,7 +96,7 @@ test.cb("extractDirDateRange should pass null if a given directory doesn't conta
 });
 test.cb('extractDirDateRange should pass an array of [min_date max_date]', t => {
     extractDirDateRange('testdir/100TEST_', fn => /\.jpe?g$/i.test(fn), result => {
-        t.is(result, [new Date(), new Date()]);
+        t.deepEqual(result, [new Date('2011-06-01T07:07:07.000Z'), new Date('2011-07-23T23:21:03.000Z')]);
         t.end();
     });
 });

@@ -1,5 +1,6 @@
 'use strict';
 const fs = require ('fs');
+const util = require ('util.js');
 
 function listFiles (dir, filterFunc) {
     return fs.readdirSync(dir).filter(filterFunc);
@@ -182,8 +183,14 @@ function extractDirDateRange (dir, filterFunc, callback) {
         });
     };
     function handleDateList (dateList) {
-        var dateListSorted = dateList.slice().sort();
-        callback(dateListSorted.splice(1, dateList.length - 2)); // sth wrong with the splice
+        var dateListSorted = dateList.slice().sort((date1, date2) => date1 - date2);
+        var out;
+        if(dateList.length > 2) {
+            out = dateListSorted.splice(1, dateList.length - 2);
+        } else {
+            out = dateListSorted;
+        }
+        callback(out);
     }
 }
 
