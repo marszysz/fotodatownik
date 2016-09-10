@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import test from 'ava';  // AVA insists on ES6 export/import 
 
 const rewire = require('rewire');
@@ -112,3 +113,12 @@ test.cb("extractDirDateRange should pass null if it doesn't have any files to wo
         t.end();
     });
 });
+
+var makeNewDirName = main.__get__('makeNewDirName');
+test("makeNewDirName should return a new dir name made from an old name, an array of date range and options", t => {
+    var testRange = [new Date('2016-01-01T00:00:00.000Z'), new Date('2016-01-02T18:00:00.000Z')];
+    t.is(makeNewDirName('100TEST_', testRange, {}), '2016.01.01-02');
+});
+
+// var dirRenameMap = main.__get__('dirRenameMap');
+test.todo('dirRenameMap should pass an object mapping existing dir names to the new names');
