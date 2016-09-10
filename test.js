@@ -108,7 +108,7 @@ test.cb('extractDirDateRange should pass an array of 2 dates even if dir has 1 f
 });
 test.cb("extractDirDateRange should pass null if it doesn't have any files to work on", t => {
     extractDirDateRange('testdir/100TEST_', fn => false, result => {
-        t.deepEqual(result, null);
+        t.is(result, null);
         t.end();
     });
 });

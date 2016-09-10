@@ -9,6 +9,6 @@ const main = rewire('./main');
 //fileRenameMap('testdir', fn => /\.jpg$/i.test(fn), {}, console.log.bind(console));
 
 var extractDirDateRange = main.__get__('extractDirDateRange');
-extractDirDateRange('testdir/100TEST_', fn => /\.jpe?g$/i.test(fn), result => {
+extractDirDateRange('testdir/100TEST_', fn => false, result => {
     console.log(result);
 });

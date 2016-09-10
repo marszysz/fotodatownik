@@ -59,7 +59,7 @@ function getExifDate (fileName, callback) {
         else {
             var msg = 'Done with a file: ';
         }
-        fs.close(fileDescriptor, error => console.log(msg + fileName, error ? ' (error on closing)' : null));
+        fs.close(fileDescriptor, error => console.log(msg + fileName, error ? ' (error on closing)' : ''));
         callback(exifDate);
         return;
     }
@@ -166,11 +166,13 @@ function extractDirDateRange (dir, filterFunc, callback) {
     try {
         fileList = listFiles(dir, filterFunc);
     } catch (err) {
-        console.log('Error opening directory ', dir, ' - ', err)
+        console.log('Error opening directory ', dir, ' - ', err.message)
     };
     if(! fileList) {
         callback(null);
+        return;
     } else {
+        if(fileList.length === 0) handleDateList(null);
         var dateList = [];
         var filesPending = fileList.length;
         fileList.forEach(collectDate);
@@ -186,6 +188,7 @@ function extractDirDateRange (dir, filterFunc, callback) {
         if(! dateList) {
             console.log(dir + ' does not contain any file to read.')
             callback(null);
+            return;
         }
         var dateListSorted;
         if(dateList.length === 1) {
