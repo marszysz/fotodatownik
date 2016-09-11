@@ -1,6 +1,6 @@
 'use strict';
 const fs = require ('fs');
-const util = require ('util.js');
+const util = require ('./util.js');
 
 function listFiles (dir, filterFunc) {
     return fs.readdirSync(dir).filter(filterFunc);
@@ -101,8 +101,8 @@ function makeNewFileName (oldFileName, fileDate, options) {
     return makeNewName(oldFileName, fileDate, options, compose);
 }
 
-function makeNewName (oldName, date, options, composeFunc) {
-    /* Composes a new file/dir name based on old name, date and options.
+function makeNewName (oldName, dates, options, composeFunc) {
+    /* Composes a new file/dir name based on old name, date (or date range in an array) and options.
     Also takes a composition function, which should compose the date part of a new name based on given object consisting of:
     y - year,
     m - month,
@@ -113,6 +113,7 @@ function makeNewName (oldName, date, options, composeFunc) {
     ds - date separator,
     ts - time separator,
     dts - date-time separator (separates date from time),
+    rs - range separator (separates a date from another one or its part),
     y2 - year of the last contained file,
     m2 - month of the last contained file,
     d2 - day of the last contained file.
@@ -121,23 +122,34 @@ function makeNewName (oldName, date, options, composeFunc) {
     src.ds = options.hasOwnProperty('dateSeparator') ? options.dateSeparator : '.';
     src.ts = options.hasOwnProperty('timeSeparator') ? options.timeSeparator : '.';
     src.dts = options.hasOwnProperty('dateTimeSeparator') ? options.dateTimeSeparator : '_';
+    src.rs = options.hasOwnProperty('rangeSeparator') ? options.rangeSeparator : '-';
 
     function padTo2 (nr) {
         nr += '';
         if(nr.length < 2) nr = '0' + nr;
         return nr;
     }
-    src.y = date.getUTCFullYear();
-    src.m = padTo2(date.getUTCMonth() + 1);  // strange JS month handling (0-11)
-    src.d = padTo2(date.getUTCDate());
-    src.h = padTo2(date.getUTCHours());
-    src.M = padTo2(date.getUTCMinutes());
-    src.s = padTo2(date.getUTCSeconds());
+    
+    if(util.getType(dates) === 'array') {
+        var date1 = dates[0];
+        var date2 = dates[1];
+        src.y2 = date2.getUTCFullYear();
+        src.m2 = padTo2(date2.getUTCMonth() + 1);  // strange JS month handling (0-11)
+        src.d2 = padTo2(date2.getUTCDate()); 
+    } else {
+        var date1 = dates;
+    }
+    src.y = date1.getUTCFullYear();
+    src.m = padTo2(date1.getUTCMonth() + 1);
+    src.d = padTo2(date1.getUTCDate());
+    src.h = padTo2(date1.getUTCHours());
+    src.M = padTo2(date1.getUTCMinutes());
+    src.s = padTo2(date1.getUTCSeconds());
     var datePart = composeFunc(src);
     var title = extractTitle(oldName);
     // if the title starts with a letter or number, direct appending to the date would be unpleasant
     // (this method is Unicode-safe)
-    if(title[0].toLowerCase() !== title[0].toUpperCase() || /\d/.test(title[0])) {
+    if(title && title[0].toLowerCase() !== title[0].toUpperCase() || /\d/.test(title[0])) {
         title = ' ' + title;
     }
     return datePart + title; 
@@ -230,7 +242,35 @@ function extractDirDateRange (dir, filterFunc, callback) {
 }
 
 function makeNewDirName (oldName, dateRange, options) {
-    return null;
+    /* Returns a new name for a directory based on old name, date range (array of 2 dates) and options.
+    Options with defaults:
+    dateSeparator: '.'  - separator of date parts
+    rangeSeparator: '-'  - separates the first date from (a part of) the second one  
+    */
+    if(util.getType(dateRange) !== 'array' || util.getType(dateRange[0]) !== 'date' || util.getType(dateRange[1]) !== 'date') {
+        throw('dateRange should be an array of 2 dates');
+    }
+    var compose = function (src) {
+        if(src.y === src.y2) {
+            var y2s = '';            
+        } else {
+            var y2s = src.y2 + src.ds;            
+        }
+        if(src.y === src.y2 && src.m === src.m2) {
+            var m2s = '';
+        } else { 
+            var m2s = src.m2 + src.ds;
+        }
+        if(src.y === src.y2 && src.m === src.m2 && src.d === src.d2) {
+            var d2 = '';
+            var rs = '';
+        } else {
+            var d2 = src.d2;
+            var rs = src.rs;                
+        }
+        return [src.y, src.ds, src.m, src.ds, src.d, rs, y2s, m2s, d2].join('');
+    }
+    return makeNewName(oldName, dateRange, options, compose);
 }
 
 // todo: what about *.thm files and asociated objects, especially videos?
