@@ -95,29 +95,52 @@ function makeNewFileName (oldFileName, fileDate, options) {
     timeSeparator: '.'  - separator of time parts
     dateTimeSeparator: '_'  - separates date from time
     */
-    var ds = options.hasOwnProperty('dateSeparator') ? options.dateSeparator : '.';
-    var ts = options.hasOwnProperty('timeSeparator') ? options.timeSeparator : '.';
-    var dts = options.hasOwnProperty('dateTimeSeparator') ? options.dateTimeSeparator : '_';
+    
+    var compose = (src => [src.y, src.ds, src.m, src.ds, src.d, src.dts, src.h, src.ts, src.M, src.ts, src.s].join(''));
 
-    function fillTo2 (nr) {
+    return makeNewName(oldFileName, fileDate, options, compose);
+}
+
+function makeNewName (oldName, date, options, composeFunc) {
+    /* Composes a new file/dir name based on old name, date and options.
+    Also takes a composition function, which should compose the date part of a new name based on given object consisting of:
+    y - year,
+    m - month,
+    d - day,
+    h - hour,
+    M - minute,
+    s - second,
+    ds - date separator,
+    ts - time separator,
+    dts - date-time separator (separates date from time),
+    y2 - year of the last contained file,
+    m2 - month of the last contained file,
+    d2 - day of the last contained file.
+    */
+    var src = {};
+    src.ds = options.hasOwnProperty('dateSeparator') ? options.dateSeparator : '.';
+    src.ts = options.hasOwnProperty('timeSeparator') ? options.timeSeparator : '.';
+    src.dts = options.hasOwnProperty('dateTimeSeparator') ? options.dateTimeSeparator : '_';
+
+    function padTo2 (nr) {
         nr += '';
         if(nr.length < 2) nr = '0' + nr;
         return nr;
     }
-    var y = fileDate.getUTCFullYear();
-    var m = fillTo2(fileDate.getUTCMonth() + 1);  // strange JS month handling (0-11)
-    var d = fillTo2(fileDate.getUTCDate());
-    var h = fillTo2(fileDate.getUTCHours());
-    var M = fillTo2(fileDate.getUTCMinutes());
-    var s = fillTo2(fileDate.getUTCSeconds());
-    var datePart = [y, ds, m, ds, d, dts, h, ts, M, ts, s].join('');
-    var title = extractTitle(oldFileName);
+    src.y = date.getUTCFullYear();
+    src.m = padTo2(date.getUTCMonth() + 1);  // strange JS month handling (0-11)
+    src.d = padTo2(date.getUTCDate());
+    src.h = padTo2(date.getUTCHours());
+    src.M = padTo2(date.getUTCMinutes());
+    src.s = padTo2(date.getUTCSeconds());
+    var datePart = composeFunc(src);
+    var title = extractTitle(oldName);
     // if the title starts with a letter or number, direct appending to the date would be unpleasant
     // (this method is Unicode-safe)
     if(title[0].toLowerCase() !== title[0].toUpperCase() || /\d/.test(title[0])) {
         title = ' ' + title;
     }
-    return datePart + title;
+    return datePart + title; 
 }
 
 function extractTitle (fileName) {
@@ -204,6 +227,10 @@ function extractDirDateRange (dir, filterFunc, callback) {
         }
         callback(out);
     }
+}
+
+function makeNewDirName (oldName, dateRange, options) {
+    return null;
 }
 
 // todo: what about *.thm files and asociated objects, especially videos?
