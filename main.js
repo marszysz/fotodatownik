@@ -118,6 +118,11 @@ function makeNewName (oldName, dates, options, composeFunc) {
     m2 - month of the last contained file,
     d2 - day of the last contained file.
     */
+    if(! oldName) throw('Missing oldName argument');
+    if(! dates) throw('Missing dates argument');
+    if(! options || util.getType(options) !== 'object') throw('Missing or invalid options argument: should be an object.');
+    if(! composeFunc || ! composeFunc instanceof Function) throw('Missing or invalid composeFunc argument: should be a function.');
+
     var src = {};
     src.ds = options.hasOwnProperty('dateSeparator') ? options.dateSeparator : '.';
     src.ts = options.hasOwnProperty('timeSeparator') ? options.timeSeparator : '.';
