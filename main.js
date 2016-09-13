@@ -278,4 +278,8 @@ function makeNewDirName (oldName, dateRange, options) {
     return makeNewName(oldName, dateRange, options, compose);
 }
 
+function dirRenameMap(outerDir, options, callback) {
+    callback(null);
+}
+
 // todo: what about *.thm files and asociated objects, especially videos?
