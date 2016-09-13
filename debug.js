@@ -1,4 +1,5 @@
 'use strict';
+require('longjohn');
 const rewire = require('rewire');
 const main = rewire('./main');
 

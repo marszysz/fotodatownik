@@ -1,6 +1,7 @@
 /* eslint-disable quotes */
-import test from 'ava';  // AVA insists on ES6 export/import 
-
+import test from 'ava';  // AVA insists on ES6 export/import
+ 
+require('longjohn');
 const rewire = require('rewire');
 const main = rewire('./main');
 
