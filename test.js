@@ -124,7 +124,13 @@ test("makeNewDirName should return a new dir name made from an old name, an arra
         ['2016-12-31T00:00:00.000Z', '2016-12-31T00:00:00.000Z', '2016.12.31'],
     ];
     testData.forEach(data => {t.is(makeNewDirName('100TEST_', [new Date(data[0]), new Date(data[1])], {}), data[2])});
-}); // todo: test with non-default options
+    var opts = {
+        dateSeparator: '--',
+        rangeSeparator: '::'
+    };
+    t.is(makeNewDirName('100TEST_-abc', [new Date(testData[1][0]), new Date(testData[1][1])], opts), '2016--01--01::02--02-abc');
+    t.is(makeNewDirName('100TEST_ teścior', [new Date(testData[1][0]), new Date(testData[1][1])], {}), '2016.01.01-02.02 teścior');
+});
 
 // var dirRenameMap = main.__get__('dirRenameMap');
 test.todo('dirRenameMap should pass an object mapping existing dir names to the new names');
