@@ -128,6 +128,8 @@ function makeNewName (oldName, dates, options, composeFunc) {
     src.ts = options.hasOwnProperty('timeSeparator') ? options.timeSeparator : '.';
     src.dts = options.hasOwnProperty('dateTimeSeparator') ? options.dateTimeSeparator : '_';
     src.rs = options.hasOwnProperty('rangeSeparator') ? options.rangeSeparator : '-';
+    var dayStart = options.hasOwnProperty('dayStart') ? options.dayStart : '0';
+    if(isNaN(dayStart)) dayStart = 0;
 
     function padTo2 (nr) {
         nr += '';
@@ -136,8 +138,8 @@ function makeNewName (oldName, dates, options, composeFunc) {
     }
     
     if(util.getType(dates) === 'array') {
-        var date1 = dates[0];
-        var date2 = dates[1];
+        var date1 = dates[0].getUTCHours() >= dayStart ? dates[0] : new Date(dates[0].valueOf() - 24*60*60*1000);
+        var date2 = dates[1].getUTCHours() >= dayStart ? dates[1] : new Date(dates[1].valueOf() - 24*60*60*1000); 
         src.y2 = date2.getUTCFullYear();
         src.m2 = padTo2(date2.getUTCMonth() + 1);  // strange JS month handling (0-11)
         src.d2 = padTo2(date2.getUTCDate()); 

@@ -119,15 +119,17 @@ var makeNewDirName = main.__get__('makeNewDirName');
 test("makeNewDirName should return a new dir name made from an old name, an array of date range and options", t => {
     var testData = [
         ['2016-01-01T00:00:00.000Z', '2016-01-02T18:00:00.000Z', '2016.01.01-02'],
-        ['2016-01-01T00:00:00.000Z', '2016-02-02T18:00:00.000Z', '2016.01.01-02.02'],
-        ['2016-12-31T00:00:00.000Z', '2017-01-01T03:00:00.000Z', '2016.12.31-2017.01.01'],
-        ['2016-12-31T00:00:00.000Z', '2016-12-31T00:00:00.000Z', '2016.12.31'],
+        ['2016-01-01T04:00:00.000Z', '2016-02-02T18:00:00.000Z', '2016.01.01-02.02'],
+        ['2016-12-31T20:00:00.000Z', '2017-01-01T03:00:00.000Z', '2016.12.31-2017.01.01'],
+        ['2016-12-31T20:00:00.000Z', '2016-12-31T00:00:00.000Z', '2016.12.31'],
     ];
     testData.forEach(data => {t.is(makeNewDirName('100TEST_', [new Date(data[0]), new Date(data[1])], {}), data[2])});
     var opts = {
         dateSeparator: '--',
-        rangeSeparator: '::'
+        rangeSeparator: '::',
+        dayStart: '04'
     };
+    t.is(makeNewDirName('100TEST_', [new Date(testData[2][0]), new Date(testData[2][1])], opts), '2016--12--31');
     t.is(makeNewDirName('100TEST_-abc', [new Date(testData[1][0]), new Date(testData[1][1])], opts), '2016--01--01::02--02-abc');
     t.is(makeNewDirName('100TEST_ teścior', [new Date(testData[1][0]), new Date(testData[1][1])], {}), '2016.01.01-02.02 teścior');
 });
