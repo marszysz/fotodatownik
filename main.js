@@ -281,7 +281,22 @@ function makeNewDirName (oldName, dateRange, options) {
 }
 
 function dirRenameMap(outerDir, options, callback) {
-    callback(null);
+    // Calls callback with an object mapping current dir names to their new names
+
+    var dirList = fs.readdirSync(outerDir).filter(fn => fs.statSync(outerDir + '/' + fn).isDirectory());
+    var dirDateMap = {'pending': dirList.length};
+    dirList.forEach(dirName => {
+        dirPath = outerDir + '/' + dirName;
+        extractDirDateRange(dirPath, fn => /\.jpe?g$/i.test(fn), dateRange => {
+            dirDateMap[dirName] = dateRange;
+            if(--dirDateMap.pending === 0) {
+                delete dirDateMap.pending;
+                generateDirRenameMap(dirDateMap);
+                // todo: reduce callback hell, finish this
+            } 
+        });   
+    });
+    callback(dirList);
 }
 
 // todo: what about *.thm files and asociated objects, especially videos?

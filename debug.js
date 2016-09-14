@@ -16,6 +16,10 @@ extractDirDateRange('testdir/100TEST_', fn => false, result => {
 });
 */
 
+/* 
 var makeNewDirName = main.__get__('makeNewDirName');
 var testRange = [new Date('2016-01-01T00:00:00.000Z'), new Date('2016-01-02T18:00:00.000Z')];
 console.log(makeNewDirName('100TEST_', testRange, {})) // should be '2016.01.01-02';
+*/
+const fs = require('fs');
+var dirList = fs.readdirSync('testdir').filter(fn => fs.statSync('testdir' + '/' + fn).isDirectory());
