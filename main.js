@@ -96,6 +96,8 @@ function makeNewFileName (oldFileName, fileDate, options) {
     dateTimeSeparator: '_'  - separates date from time
     */
     
+    if(fileDate === null) return null;
+
     var compose = (src => [src.y, src.ds, src.m, src.ds, src.d, src.dts, src.h, src.ts, src.M, src.ts, src.s].join(''));
 
     return makeNewName(oldFileName, fileDate, options, compose);
@@ -156,7 +158,7 @@ function makeNewName (oldName, dates, options, composeFunc) {
     var title = extractTitle(oldName);
     // if the title starts with a letter or number, direct appending to the date would be unpleasant
     // (this method is Unicode-safe)
-    if(title && title[0].toLowerCase() !== title[0].toUpperCase() || /\d/.test(title[0])) {
+    if(title && (title[0].toLowerCase() !== title[0].toUpperCase() || /\d/.test(title[0]))) {
         title = ' ' + title;
     }
     return datePart + title; 
@@ -253,9 +255,11 @@ function makeNewDirName (oldName, dateRange, options) {
     Options with defaults:
     dateSeparator: '.'  - separator of date parts
     rangeSeparator: '-'  - separates the first date from (a part of) the second one  
+    dayStart: 0  -  hour which starts a new day (any date with hour < dayStart will be converted to the preceding day) 
     */
+    if(dateRange === null) return null;
     if(util.getType(dateRange) !== 'array' || util.getType(dateRange[0]) !== 'date' || util.getType(dateRange[1]) !== 'date') {
-        throw('dateRange should be an array of 2 dates');
+        throw(new Error('dateRange should be an array of 2 dates.'));
     }
     var compose = function (src) {
         if(src.y === src.y2) {
@@ -280,23 +284,33 @@ function makeNewDirName (oldName, dateRange, options) {
     return makeNewName(oldName, dateRange, options, compose);
 }
 
-function dirRenameMap(outerDir, options, callback) {
-    // Calls callback with an object mapping current dir names to their new names
+function dirRenameMap (outerDir, options, callback) {
+    // Calls callback with an object mapping current dir names to their new names.
+    // Passes options object to makeNewDirName.
 
     var dirList = fs.readdirSync(outerDir).filter(fn => fs.statSync(outerDir + '/' + fn).isDirectory());
     var dirDateMap = {'pending': dirList.length};
+    Object.defineProperty(dirDateMap, 'baseDir', {value: outerDir});
     dirList.forEach(dirName => {
-        dirPath = outerDir + '/' + dirName;
-        extractDirDateRange(dirPath, fn => /\.jpe?g$/i.test(fn), dateRange => {
-            dirDateMap[dirName] = dateRange;
-            if(--dirDateMap.pending === 0) {
-                delete dirDateMap.pending;
-                generateDirRenameMap(dirDateMap);
-                // todo: reduce callback hell, finish this
-            } 
-        });   
+        var dirPath = outerDir + '/' + dirName;
+        extractDirDateRange(dirPath, fn => /\.jpe?g$/i.test(fn), buildDirDateMap.bind(this, dirName));   
     });
-    callback(dirList);
+    function buildDirDateMap (dirName, dateRange) {
+        dirDateMap[dirName] = dateRange;
+        if(--dirDateMap.pending === 0) {
+            delete dirDateMap.pending;
+            buildDirRenameMap(dirDateMap);
+        }
+    }
+    function buildDirRenameMap (dirDateMap) {
+        var dirRenameMap = {};
+        Object.defineProperty(dirRenameMap, 'baseDir', {value: outerDir});
+        
+        Object.keys(dirDateMap).forEach(dirName => {
+            dirRenameMap[dirName] = makeNewDirName(dirName, dirDateMap[dirName], options);
+        });
+        callback(dirRenameMap);
+    }
 }
 
 // todo: what about *.thm files and asociated objects, especially videos?

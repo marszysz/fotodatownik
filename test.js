@@ -138,7 +138,8 @@ var dirRenameMap = main.__get__('dirRenameMap');
 test.cb('dirRenameMap should pass an object mapping existing dir names to the new names', t => {
     var expected = {
         '100TEST_': '2011.06.01-07.23',
-        '101TEST_ test test test': '2012.05.24-28' // time of the last file: 2012-05-29 00:10:26 
+        '101TEST_ test test test': '2012.05.24-28 test test test',  // time of the last file: 2012-05-29 00:10:26
+        '102EMPTY': null 
     };
     dirRenameMap('testdir', {dayStart: 1}, result => {
         t.deepEqual(result, expected);
