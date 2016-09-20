@@ -74,7 +74,7 @@ function fileDateMap (dir, fileArray, callback) {
     if(!callback) throw 'Empty callback';
     var result = {};
     result.filesPending = fileArray.length;
-    Object.defineProperty(result, 'baseDir', {value: dir});
+    Object.defineProperty(result, 'baseDir', {value: dir, enumerable: false});
     fileArray.forEach(gatherDates);
   
     function gatherDates (fileName) {
@@ -300,7 +300,7 @@ function makeNewDirName (oldName, dateRange, options) {
 function dirRenameMap (outerDir, options, callback) {
     var dirList = fs.readdirSync(outerDir).filter(fn => fs.statSync(outerDir + '/' + fn).isDirectory());
     var dirDateMap = {'pending': dirList.length};
-    Object.defineProperty(dirDateMap, 'baseDir', {value: outerDir});
+    Object.defineProperty(dirDateMap, 'baseDir', {value: outerDir, enumerable: false});
     dirList.forEach(dirName => {
         var dirPath = outerDir + '/' + dirName;
         extractDirDateRange(dirPath, fn => /\.jpe?g$/i.test(fn), buildDirDateMap.bind(this, dirName));   
@@ -314,7 +314,7 @@ function dirRenameMap (outerDir, options, callback) {
     }
     function buildDirRenameMap (dirDateMap) {
         var dirRenameMap = {};
-        Object.defineProperty(dirRenameMap, 'baseDir', {value: outerDir});
+        Object.defineProperty(dirRenameMap, 'baseDir', {value: outerDir, enumerable: false});
         
         Object.keys(dirDateMap).forEach(dirName => {
             dirRenameMap[dirName] = makeNewDirName(dirName, dirDateMap[dirName], options);
