@@ -139,12 +139,12 @@ test.cb('dirRenameMap should pass an object mapping existing dir names to the ne
     var expected = {
         '100TEST_': '2011.06.01-07.23',
         '101TEST_ test test test': '2012.05.24-28 test test test',  // time of the last file: 2012-05-29 00:10:26
-        '102EMPTY': null 
+        '102EMPTY': null,
+        'No EXIF files at all': null,
+        'a mix': '2011.06.01-07.23 a mix'  
     };
     dirRenameMap('testdir', {dayStart: 1}, result => {
         t.deepEqual(result, expected);
         t.end();
     });
 });
-
-// todo: dla makeNewFileName i makeNewDirName dorzucić testy sprawdzające parsowanie nazwy już zmienionej na datę 
