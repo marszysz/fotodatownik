@@ -21,3 +21,6 @@ var makeNewDirName = main.__get__('makeNewDirName');
 var testRange = [new Date('2016-01-01T00:00:00.000Z'), new Date('2016-01-02T18:00:00.000Z')];
 console.log(makeNewDirName('100TEST_', testRange, {})) // should be '2016.01.01-02';
 */
+
+var dirRenameMap = main.__get__('dirRenameMap');
+dirRenameMap('testdir', {dayStart: 1}, result => {console.log(result)});

@@ -1,19 +1,21 @@
 'use strict';
 const fs = require ('fs');
+const exifParser = require('exif-parser');
+const moment = require('moment');
+
 const util = require ('./util.js');
 
 function listFiles (dir, filterFunc) {
     return fs.readdirSync(dir).filter(filterFunc);
 }
 
+// reads `date taken` from fileName and passes it to callback
+// in the form of Date object, null if failed.
+// Uses UTC since no timezone is available in DateTimeOriginal tag.
 function getExifDate (fileName, callback) {
-    // reads `date taken` from fileName and passes it to callback
-    // in the form of Date object, null if failed.
-    // Uses UTC since no timezone is available in DateTimeOriginal tag.
 
     if(!callback) throw 'Empty callback';
 
-    var fs = require('fs');
     fs.stat(fileName, processFile);
 
     function processFile (error, stats) {
@@ -42,7 +44,7 @@ function getExifDate (fileName, callback) {
             callback(null);
             return;
         }
-        var parser = require('exif-parser').create(buffer);
+        var parser = exifParser.create(buffer);
         parser.enableImageSize(false);
         parser.enableSimpleValues(true); // returns UNIX timestamp w. this flag (raw string otherwise)
         var result;
@@ -51,13 +53,14 @@ function getExifDate (fileName, callback) {
         }
         catch (err) {}
         var exifDate = result && result.tags.DateTimeOriginal ?
-                new Date(result.tags.DateTimeOriginal * 1000) :
-                null;
+            new Date(result.tags.DateTimeOriginal * 1000) :
+            null;
+        var msg;
         if (!exifDate) {
-            var msg = 'EXIF date not present or EXIF unreadable in file: ';
+            msg = 'EXIF date not present or EXIF unreadable in file: ';
         }
         else {
-            var msg = 'Done with a file: ';
+            msg = 'Done with a file: ';
         }
         fs.close(fileDescriptor, error => console.log(msg + fileName, error ? ' (error on closing)' : ''));
         callback(exifDate);
@@ -65,9 +68,9 @@ function getExifDate (fileName, callback) {
     }
 }
 
+// calls the callback with an object which maps filenames
+// from fileArray located in dir to their EXIF DateCreated dates
 function fileDateMap (dir, fileArray, callback) {
-    // calls the callback with an object which maps filenames
-    // from fileArray located in dir to their EXIF DateCreated dates
     if(!callback) throw 'Empty callback';
     var result = {};
     result.filesPending = fileArray.length;
@@ -88,13 +91,13 @@ function fileDateMap (dir, fileArray, callback) {
     }
 }
 
+/* Composes a new file name from the old one, a date object and options object.
+options with defaults:
+dateSeparator: '.'  - separator of date parts
+timeSeparator: '.'  - separator of time parts
+dateTimeSeparator: '_'  - separates date from time
+*/
 function makeNewFileName (oldFileName, fileDate, options) {
-    /* Composes a new file name from the old one, a date object and options object.
-    options with defaults:
-    dateSeparator: '.'  - separator of date parts
-    timeSeparator: '.'  - separator of time parts
-    dateTimeSeparator: '_'  - separates date from time
-    */
     
     if(fileDate === null) return null;
 
@@ -103,23 +106,24 @@ function makeNewFileName (oldFileName, fileDate, options) {
     return makeNewName(oldFileName, fileDate, options, compose);
 }
 
+/* Composes a new file/dir name based on old name, date (or date range in an array) and options.
+Also takes a composition function, which should compose the date part of a new name
+based on given object consisting of values with keys:
+y - year,
+m - month,
+d - day,
+h - hour,
+M - minute,
+s - second,
+ds - date separator,
+ts - time separator,
+dts - date-time separator (separates date from time),
+rs - range separator (separates a date from another one or its part),
+y2 - year of the last contained file,
+m2 - month of the last contained file,
+d2 - day of the last contained file.
+*/
 function makeNewName (oldName, dates, options, composeFunc) {
-    /* Composes a new file/dir name based on old name, date (or date range in an array) and options.
-    Also takes a composition function, which should compose the date part of a new name based on given object consisting of:
-    y - year,
-    m - month,
-    d - day,
-    h - hour,
-    M - minute,
-    s - second,
-    ds - date separator,
-    ts - time separator,
-    dts - date-time separator (separates date from time),
-    rs - range separator (separates a date from another one or its part),
-    y2 - year of the last contained file,
-    m2 - month of the last contained file,
-    d2 - day of the last contained file.
-    */
     if(! oldName) throw('Missing oldName argument');
     if(! dates) throw('Missing dates argument');
     if(! options || util.getType(options) !== 'object') throw('Missing or invalid options argument: should be an object.');
@@ -139,14 +143,16 @@ function makeNewName (oldName, dates, options, composeFunc) {
         return nr;
     }
     
+    var date1;
+    var date2;
     if(util.getType(dates) === 'array') {
-        var date1 = dates[0].getUTCHours() >= dayStart ? dates[0] : new Date(dates[0].valueOf() - 24*60*60*1000);
-        var date2 = dates[1].getUTCHours() >= dayStart ? dates[1] : new Date(dates[1].valueOf() - 24*60*60*1000); 
+        date1 = dates[0].getUTCHours() >= dayStart ? dates[0] : moment(dates[0]).subtract(1, 'day').toDate();
+        date2 = dates[1].getUTCHours() >= dayStart ? dates[1] : moment(dates[1]).subtract(1, 'day').toDate(); 
         src.y2 = date2.getUTCFullYear();
-        src.m2 = padTo2(date2.getUTCMonth() + 1);  // strange JS month handling (0-11)
+        src.m2 = padTo2(date2.getUTCMonth() + 1);  // strange JS month handling (0-indexed)
         src.d2 = padTo2(date2.getUTCDate()); 
     } else {
-        var date1 = dates;
+        date1 = dates;
     }
     src.y = date1.getUTCFullYear();
     src.m = padTo2(date1.getUTCMonth() + 1);
@@ -164,11 +170,11 @@ function makeNewName (oldName, dates, options, composeFunc) {
     return datePart + title; 
 }
 
+/* Extracts and returns file/dir title from a given file/dir name, if there is one,
+empty string otherwise. The title is everything after: the standard filename
+(without extension) given by the DCF compliant camera, a date or date range.
+*/
 function extractTitle (fileName) {
-    // Extracts and returns file/dir title from a given file/dir name, if there is one,
-    // empty string otherwise. The title is everything after: the standard filename
-    // (without extension) given by the DCF compliant camera, a date or date range.
-
     /* from Wikipedia on DCF specification: 
     Subdirectory names (such as "123ABCDE") consist of a unique directory number (in the range 100…999)
     and five alphanumeric characters, which may be freely chosen.
@@ -178,15 +184,13 @@ function extractTitle (fileName) {
     The file extension is "JPG" for Exif files and "THM" for Exif files that represent thumbnails
     of other files than "JPG".
     */
-
-    var pattern = /^\w{4}\d+|\d{3}\w{5}|\d{4}\W?\d\d\W?\d\d(-(((\d{4}\W?)?\d\d\W?)?\d\d))?/;
-    return fileName.replace(pattern, '');
+    var baseNamePattern = /^\w{4}\d+|\d{3}\w{5}|\d{4}\W?\d\d\W?\d\d(-(((\d{4}\W?)?\d\d\W?)?\d\d))?/;
+    return fileName.replace(baseNamePattern, '');
 }
 
+// Calls callback with generated object which maps filenames to their new names.
+// Takes a directory name, filename filter function and options object for makeNewFileName.  
 function fileRenameMap (dir, filterFunc, options, callback) {
-    // Calls callback with generated object which maps filenames to their new names.
-    // Takes a directory name, filename filter function and options object for makeNewFileName.  
-
     if(!callback) throw 'Empty callback';
 
     var fileList = listFiles(dir, filterFunc);
@@ -205,6 +209,9 @@ function fileRenameMap (dir, filterFunc, options, callback) {
     }
 }
 
+/* Calls callback with a date range array: [start_date end_date]
+extracted from files in dir filtered by filterFunc.
+*/
 function extractDirDateRange (dir, filterFunc, callback) {
     var fileList = null;
     try {
@@ -224,13 +231,13 @@ function extractDirDateRange (dir, filterFunc, callback) {
 
     function collectDate (fileName) {
         getExifDate(dir + '/' + fileName, date => {
-            dateList.push(date);
+            if(date !== null) dateList.push(date);
             if(--filesPending === 0) handleDateList(dateList);
         });
     };
     function handleDateList (dateList) {
-        if(! dateList) {
-            console.log(dir + ' does not contain any file to read.')
+        if(! dateList || dateList.length === 0) {
+            console.log(dir + ' does not contain any file with readable EXIF.')
             callback(null);
             return;
         }
@@ -250,44 +257,47 @@ function extractDirDateRange (dir, filterFunc, callback) {
     }
 }
 
+/* Returns a new name for a directory based on old name, date range (array of 2 dates) and options.
+Options with defaults:
+dateSeparator: '.'  - separator of date parts
+rangeSeparator: '-'  - separates the first date from (a part of) the second one  
+dayStart: 0  -  hour which starts a new day (any date with hour < dayStart will be converted to the preceding day) 
+*/
 function makeNewDirName (oldName, dateRange, options) {
-    /* Returns a new name for a directory based on old name, date range (array of 2 dates) and options.
-    Options with defaults:
-    dateSeparator: '.'  - separator of date parts
-    rangeSeparator: '-'  - separates the first date from (a part of) the second one  
-    dayStart: 0  -  hour which starts a new day (any date with hour < dayStart will be converted to the preceding day) 
-    */
     if(dateRange === null) return null;
     if(util.getType(dateRange) !== 'array' || util.getType(dateRange[0]) !== 'date' || util.getType(dateRange[1]) !== 'date') {
         throw(new Error('dateRange should be an array of 2 dates.'));
     }
     var compose = function (src) {
+        var y2s;  // second date's year with appended separator - and so on below
         if(src.y === src.y2) {
-            var y2s = '';            
+            y2s = '';            
         } else {
-            var y2s = src.y2 + src.ds;            
+            y2s = src.y2 + src.ds;            
         }
+        var m2s;
         if(src.y === src.y2 && src.m === src.m2) {
-            var m2s = '';
+            m2s = '';
         } else { 
-            var m2s = src.m2 + src.ds;
+            m2s = src.m2 + src.ds;
         }
+        var d2;
+        var rs;
         if(src.y === src.y2 && src.m === src.m2 && src.d === src.d2) {
-            var d2 = '';
-            var rs = '';
+            d2 = '';
+            rs = '';
         } else {
-            var d2 = src.d2;
-            var rs = src.rs;                
+            d2 = src.d2;
+            rs = src.rs;                
         }
         return [src.y, src.ds, src.m, src.ds, src.d, rs, y2s, m2s, d2].join('');
     }
     return makeNewName(oldName, dateRange, options, compose);
 }
 
+// Calls callback with an object mapping current dir names to their new names.
+// Passes options object to makeNewDirName.
 function dirRenameMap (outerDir, options, callback) {
-    // Calls callback with an object mapping current dir names to their new names.
-    // Passes options object to makeNewDirName.
-
     var dirList = fs.readdirSync(outerDir).filter(fn => fs.statSync(outerDir + '/' + fn).isDirectory());
     var dirDateMap = {'pending': dirList.length};
     Object.defineProperty(dirDateMap, 'baseDir', {value: outerDir});
