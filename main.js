@@ -13,7 +13,6 @@ function listFiles (dir, filterFunc) {
 // in the form of Date object, null if failed.
 // Uses UTC since no timezone is available in DateTimeOriginal tag.
 function getExifDate (fileName, callback) {
-
     if(!callback) throw 'Empty callback';
 
     fs.stat(fileName, processFile);
@@ -24,7 +23,7 @@ function getExifDate (fileName, callback) {
             callback(null);
             return;
         }
-        fs.open(fileName, 'r', processExifBlock.bind(this, stats));
+        fs.open(fileName, 'r', processExifBlock.bind(undefined, stats));
     }
 
     function processExifBlock (stats, error, fileDescriptor) {
@@ -35,7 +34,7 @@ function getExifDate (fileName, callback) {
         }
         var exifEnd = 65635; // the maximum position within the JPEG file where EXIF metadata block could reach
         var exifBuffer = Buffer.allocUnsafe(stats.size < exifEnd ? stats.size : exifEnd);
-        fs.read(fileDescriptor, exifBuffer, 0, exifBuffer.length, 0, parseExif.bind(this, fileDescriptor));
+        fs.read(fileDescriptor, exifBuffer, 0, exifBuffer.length, 0, parseExif.bind(undefined, fileDescriptor));
     }
 
     function parseExif (fileDescriptor, error, bytesRead, buffer) {
@@ -79,7 +78,7 @@ function fileDateMap (dir, fileArray, callback) {
   
     function gatherDates (fileName) {
         var filePath = result.baseDir + '/' + fileName;
-        getExifDate(filePath, collectDate.bind(this, fileName));
+        getExifDate(filePath, collectDate.bind(undefined, fileName));
     }
 
     function collectDate (fileName, date) {
@@ -98,7 +97,6 @@ timeSeparator: '.'  - separator of time parts
 dateTimeSeparator: '_'  - separates date from time
 */
 function makeNewFileName (oldFileName, fileDate, options) {
-    
     if(fileDate === null) return null;
 
     var compose = (src => [src.y, src.ds, src.m, src.ds, src.d, src.dts, src.h, src.ts, src.M, src.ts, src.s].join(''));
@@ -127,7 +125,7 @@ function makeNewName (oldName, dates, options, composeFunc) {
     if(! oldName) throw('Missing oldName argument');
     if(! dates) throw('Missing dates argument');
     if(! options || util.getType(options) !== 'object') throw('Missing or invalid options argument: should be an object.');
-    if(! composeFunc || ! composeFunc instanceof Function) throw('Missing or invalid composeFunc argument: should be a function.');
+    if(! composeFunc || !(composeFunc instanceof Function)) throw('Missing or invalid composeFunc argument: should be a function.');
 
     var src = {};
     src.ds = options.hasOwnProperty('dateSeparator') ? options.dateSeparator : '.';
@@ -217,8 +215,8 @@ function extractDirDateRange (dir, filterFunc, callback) {
     try {
         fileList = listFiles(dir, filterFunc);
     } catch (err) {
-        console.log('Error opening directory ', dir, ' - ', err.message)
-    };
+        console.log('Error opening directory ', dir, ' - ', err.message);
+    }
     if(! fileList) {
         callback(null);
         return;
@@ -227,17 +225,17 @@ function extractDirDateRange (dir, filterFunc, callback) {
         var dateList = [];
         var filesPending = fileList.length;
         fileList.forEach(collectDate);
-    };
+    }
 
     function collectDate (fileName) {
         getExifDate(dir + '/' + fileName, date => {
             if(date !== null) dateList.push(date);
             if(--filesPending === 0) handleDateList(dateList);
         });
-    };
+    }
     function handleDateList (dateList) {
         if(! dateList || dateList.length === 0) {
-            console.log(dir + ' does not contain any file with readable EXIF.')
+            console.log(dir + ' does not contain any file with readable EXIF.');
             callback(null);
             return;
         }
@@ -246,7 +244,7 @@ function extractDirDateRange (dir, filterFunc, callback) {
             dateListSorted = dateList.concat(dateList);
         } else {
             dateListSorted = dateList.slice().sort((date1, date2) => date1 - date2);
-        };
+        }
         var out;
         if(dateList.length > 2) {
             out = dateListSorted.splice(1, dateList.length - 2);
@@ -291,7 +289,7 @@ function makeNewDirName (oldName, dateRange, options) {
             rs = src.rs;                
         }
         return [src.y, src.ds, src.m, src.ds, src.d, rs, y2s, m2s, d2].join('');
-    }
+    };
     return makeNewName(oldName, dateRange, options, compose);
 }
 
@@ -323,4 +321,4 @@ function dirRenameMap (outerDir, options, callback) {
     }
 }
 
-// todo: what about *.thm files and asociated objects, especially videos?
+// TODO: what about *.thm files and asociated objects, especially videos?

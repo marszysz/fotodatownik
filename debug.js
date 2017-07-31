@@ -1,5 +1,5 @@
 'use strict';
-require('longjohn');
+// require('longjohn'); 
 const rewire = require('rewire');
 const main = rewire('./main');
 
@@ -23,4 +23,4 @@ console.log(makeNewDirName('100TEST_', testRange, {})) // should be '2016.01.01-
 */
 
 var dirRenameMap = main.__get__('dirRenameMap');
-dirRenameMap('testdir', {dayStart: 1}, result => {console.log(result)});
+dirRenameMap('testdir', {dayStart: 1}, result => {console.log(result);});

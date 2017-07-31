@@ -1,7 +1,8 @@
 /* eslint-disable quotes */
+/*jshint multistr:true */
 import test from 'ava';  // AVA insists on ES6 export/import
  
-require('longjohn');
+// require('longjohn');  shouldn't need that with MSVSC v. 1.11+
 const rewire = require('rewire');
 const main = rewire('./main');
 
@@ -81,7 +82,7 @@ test.cb('fileRenameMap should pass an object which maps existing filenames to ne
     var expected = {
         '1.jpg': '2011.06.01_07.07.07 1.jpg',
         'c.jpg': null,
-    }
+    };
     fileRenameMap('testdir', fn => /^[1c]\.jpg$/.test(fn), {}, result => {
         t.deepEqual(result, expected);
         t.end();
@@ -123,7 +124,7 @@ test("makeNewDirName should return a new dir name made from an old name, an arra
         ['2016-12-31T20:00:00.000Z', '2017-01-01T03:00:00.000Z', '2016.12.31-2017.01.01'],
         ['2016-12-31T20:00:00.000Z', '2016-12-31T00:00:00.000Z', '2016.12.31'],
     ];
-    testData.forEach(data => {t.is(makeNewDirName('100TEST_', [new Date(data[0]), new Date(data[1])], {}), data[2])});
+    testData.forEach(data => {t.is(makeNewDirName('100TEST_', [new Date(data[0]), new Date(data[1])], {}), data[2]);});
     var opts = {
         dateSeparator: '--',
         rangeSeparator: '::',
@@ -148,3 +149,6 @@ test.cb('dirRenameMap should pass an object mapping existing dir names to the ne
         t.end();
     });
 });
+
+// var renameFiles = main.__get__('renameFiles');
+test.todo('How to test a function which executes renaming files?');
