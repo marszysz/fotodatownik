@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "exif-parser": "^0.1.9",
-    "moment": "^2.15.0",
+    "moment": "^2.18.1",
     "rewire": "^2.5.2"
   }
 }

@@ -3,6 +3,7 @@
 import test from 'ava';  // AVA insists on ES6 export/import
  
 // require('longjohn');  shouldn't need that with MSVSC v. 1.11+
+
 const rewire = require('rewire');
 const main = rewire('./main');
 

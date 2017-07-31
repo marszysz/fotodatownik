@@ -9,7 +9,7 @@ function listFiles (dir, filterFunc) {
     return fs.readdirSync(dir).filter(filterFunc);
 }
 
-// reads `date taken` from fileName and passes it to callback
+// reads `date taken` from fileName (full path) and passes it to callback
 // in the form of Date object, null if failed.
 // Uses UTC since no timezone is available in DateTimeOriginal tag.
 function getExifDate (fileName, callback) {
@@ -67,8 +67,10 @@ function getExifDate (fileName, callback) {
     }
 }
 
-// calls the callback with an object which maps filenames
-// from fileArray located in dir to their EXIF DateCreated dates
+/* builds a file->date map object which maps filenames
+from fileArray located in dir to their EXIF DateCreated dates
+and calls callback with that object
+*/
 function fileDateMap (dir, fileArray, callback) {
     if(!callback) throw 'Empty callback';
     var result = {};
@@ -322,3 +324,4 @@ function dirRenameMap (outerDir, options, callback) {
 }
 
 // TODO: what about *.thm files and asociated objects, especially videos?
+// Also, videos without *.thm files, having their dates only in fs attributes...
