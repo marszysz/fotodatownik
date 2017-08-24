@@ -1,4 +1,7 @@
 'use strict';
+
+// Main functions: fileRenameMap, dirRenameMap
+
 const fs = require ('fs');
 const exifParser = require('exif-parser');
 const moment = require('moment');
@@ -188,7 +191,7 @@ function extractTitle (fileName) {
     return fileName.replace(baseNamePattern, '');
 }
 
-// Calls callback with generated object which maps filenames to their new names.
+// Generates an object which maps filenames to their new names and calls callback with it.
 // Takes a directory name, filename filter function and options object for makeNewFileName.  
 function fileRenameMap (dir, filterFunc, options, callback) {
     if(!callback) throw 'Empty callback';
@@ -295,7 +298,7 @@ function makeNewDirName (oldName, dateRange, options) {
     return makeNewName(oldName, dateRange, options, compose);
 }
 
-// Calls callback with an object mapping current dir names to their new names.
+// Generates an object mapping current dir names to their new names and calls callback with it.
 // Passes options object to makeNewDirName.
 function dirRenameMap (outerDir, options, callback) {
     var dirList = fs.readdirSync(outerDir).filter(fn => fs.statSync(outerDir + '/' + fn).isDirectory());
@@ -321,6 +324,14 @@ function dirRenameMap (outerDir, options, callback) {
         });
         callback(dirRenameMap);
     }
+}
+
+// Executes renaming of files or directories passed as a map object.
+// Calls callback with an object mapping filenames to failure messages (if any).
+function renameFiles (renameMap, callback) {
+    //var failureMap = {};
+    //Object.keys(renameMap).
+    callback(null);
 }
 
 // TODO: what about *.thm files and asociated objects, especially videos?

@@ -80,7 +80,7 @@ test('makeNewFileName should compose a new file name based on the old name, file
 
 var fileRenameMap = main.__get__('fileRenameMap');
 test.cb('fileRenameMap should pass an object which maps existing filenames to new ones', t => {
-    var expected = {
+    let expected = {
         '1.jpg': '2011.06.01_07.07.07 1.jpg',
         'c.jpg': null,
     };
@@ -126,7 +126,7 @@ test("makeNewDirName should return a new dir name made from an old name, an arra
         ['2016-12-31T20:00:00.000Z', '2016-12-31T00:00:00.000Z', '2016.12.31'],
     ];
     testData.forEach(data => {t.is(makeNewDirName('100TEST_', [new Date(data[0]), new Date(data[1])], {}), data[2]);});
-    var opts = {
+    let opts = {
         dateSeparator: '--',
         rangeSeparator: '::',
         dayStart: '04'
@@ -137,8 +137,8 @@ test("makeNewDirName should return a new dir name made from an old name, an arra
 });
 
 var dirRenameMap = main.__get__('dirRenameMap');
-test.cb('dirRenameMap should pass an object mapping existing dir names to the new names', t => {
-    var expected = {
+test.cb("dirRenameMap should pass an object mapping existing dir names to the new names", t => {
+    let expected = {
         '100TEST_': '2011.06.01-07.23',
         '101TEST_ test test test': '2012.05.24-28 test test test',  // time of the last file: 2012-05-29 00:10:26
         '102EMPTY': null,
@@ -151,5 +151,12 @@ test.cb('dirRenameMap should pass an object mapping existing dir names to the ne
     });
 });
 
-// var renameFiles = main.__get__('renameFiles');
-test.todo('How to test a function which executes renaming files?');
+var renameFiles = main.__get__('renameFiles');
+test.cb("renameFiles should rename files, but only if the target doesn't exist", t => {
+    // testdir/c.jpg is a 0-byte file
+    // process.chdir('testdir'); <- this seems to break the test system in a very weird way
+    renameFiles({'testdir/blah': 'testdir/a.jpg'}, errList => {
+        t.deepEqual(errList, {'testdir/a.jpg': 'File exists'}); // what to do with file paths? Need to make this consistent
+        t.end();
+    });
+});
