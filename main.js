@@ -329,9 +329,31 @@ function dirRenameMap (outerDir, options, callback) {
 // Executes renaming of files or directories passed as a map object.
 // Calls callback with an object mapping filenames to failure messages (if any).
 function renameFiles (renameMap, callback) {
-    //var failureMap = {};
-    //Object.keys(renameMap).
-    callback(null);
+    var failures = {};
+    var pending = Object.keys(renameMap).length;
+    Object.keys(renameMap).forEach(fn => renameIfExistsNot(fn));
+    function renameIfExistsNot (fn) {
+        fs.access(renameMap[fn], fs.constants.F_OK, err => {
+            renameFile(err ? null : 'target exists', fn, renameMap[fn]);
+        });
+    }
+    function renameFile (err, oldName, newName) {
+        if (err) {
+            buildFailureList(err, oldName);
+        }
+        else {
+            // do it; manage the error format
+            buildFailureList('actually do it', oldName);
+        }
+    }
+    function buildFailureList(err, fn) {
+        if (err) {
+            failures[fn] = err;
+        }
+        if (--pending === 0) {
+            callback(failures);
+        }
+    }
 }
 
 // TODO: what about *.thm files and asociated objects, especially videos?
