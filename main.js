@@ -1,6 +1,6 @@
 'use strict';
 
-// Main functions: fileRenameMap, dirRenameMap
+// Main functions: fileRenameMap, dirRenameMap, renameFiles
 
 const fs = require ('fs');
 const exifParser = require('exif-parser');
@@ -327,6 +327,7 @@ function dirRenameMap (outerDir, options, callback) {
 }
 
 // Executes renaming of files or directories passed as a map object.
+// Refuses to replace an existing file.
 // Calls callback with an object mapping filenames to failure messages (if any).
 function renameFiles (renameMap, callback) {
     var failures = {};
@@ -334,7 +335,7 @@ function renameFiles (renameMap, callback) {
     Object.keys(renameMap).forEach(fn => renameIfExistsNot(fn));
     function renameIfExistsNot (fn) {
         fs.access(renameMap[fn], fs.constants.F_OK, err => {
-            renameFile(err ? null : 'target exists', fn, renameMap[fn]);
+            renameFile(err ? null : new Error('target exists'), fn, renameMap[fn]);
         });
     }
     function renameFile (err, oldName, newName) {
@@ -342,13 +343,12 @@ function renameFiles (renameMap, callback) {
             buildFailureList(err, oldName);
         }
         else {
-            // do it; manage the error format
-            buildFailureList('actually do it', oldName);
+            fs.rename(oldName, newName, err => buildFailureList(err, oldName));
         }
     }
     function buildFailureList(err, fn) {
         if (err) {
-            failures[fn] = err;
+            failures[fn] = err.message;
         }
         if (--pending === 0) {
             callback(failures);
@@ -356,5 +356,5 @@ function renameFiles (renameMap, callback) {
     }
 }
 
-// TODO: what about *.thm files and asociated objects, especially videos?
+// TODO: what about *.thm files and associated objects, especially videos?
 // Also, videos without *.thm files, having their dates only in fs attributes...

@@ -161,21 +161,25 @@ const fileExists = function (fn) {
 };
 var renameFiles = main.__get__('renameFiles');
 test.cb("renameFiles should rename files, but only if the target doesn't exist", t => {
-    // testdir/c.jpg is a 0-byte file
-    let testfiles = ['testdir/c.jpg', 'testdir/c.jpg.renamed'];
-    renameFiles({'testdir/blah': testfiles[0]}, errList => {
-        t.deepEqual(errList, {'testdir/blah': 'target exists'}, 'should deny replacing an existing file');
-        t.end();
-    });
-    renameFiles({[testfiles[0]]: testfiles[1]}, errList => {
-        t.plan(5);
-        t.deepEqual(errList, {}, 'Renaming should succeed');
-        t.true(fileExists(testfiles[1]), 'The renamed file should exist');
-        renameFiles({[testfiles[1]]: testfiles[0]}, errList => {
-            t.deepEqual(errList, {}, 'Renaming back should succeed');
-            t.true(fileExists(testfiles[0]), 'The original filename should exist back again');
-            t.false(fileExists(testfiles[1]), 'The renamed file should exist no more');
+    // testdir/d is a 0-byte file, testdir/e is a directory
+    // testRename renames 1st arg to 2nd and back again, 1st should exist, 2nd shouldn't
+    testRename('testdir/d', 'testdir/d.renamed');
+    testRename('etdr/e', 'testdir/e.renamed');
+    function testRename (fn1, fn2) {
+        renameFiles({'testdir/blah': fn1}, errList => {
+            t.deepEqual(errList, {'testdir/blah': 'target exists'}, 'should deny replacing an existing file');
             t.end();
         });
+        renameFiles({[fn1]: fn2}, errList => {
+            t.plan(5);
+            t.deepEqual(errList, {}, 'Renaming should succeed');
+            t.true(fileExists(fn2), 'The renamed file should exist');
+            renameFiles({[fn2]: fn1}, errList => {
+                t.deepEqual(errList, {}, 'Renaming back should succeed');
+                t.true(fileExists(fn1), 'The original filename should exist back again');
+                t.false(fileExists(fn2), 'The renamed file should exist no more');
+                t.end();
+            });
+        });
+    }
     });
-});
