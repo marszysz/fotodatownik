@@ -358,3 +358,5 @@ function renameFiles (renameMap, callback) {
 
 // TODO: what about *.thm files and associated objects, especially videos?
 // Also, videos without *.thm files, having their dates only in fs attributes...
+
+// TODO: suspicious cases (very old dates, subdirs with photos and another subdirs)
