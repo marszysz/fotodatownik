@@ -2,7 +2,7 @@
 
 // Main functions: fileRenameMap, dirRenameMap, renameFiles
 
-const fs = require ('fs');
+const fs = require ('graceful-fs');
 const exifParser = require('exif-parser');
 const moment = require('moment');
 

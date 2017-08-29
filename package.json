@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "exif-parser": "^0.1.9",
+    "graceful-fs": "^4.1.11",
     "moment": "^2.18.1",
     "rewire": "^2.5.2"
   }
