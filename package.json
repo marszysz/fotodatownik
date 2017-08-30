@@ -1,6 +1,6 @@
 {
   "name": "fotodatownik",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Apka do ustawiania nazw plików i katalogów wg dat w kolekcjach jpeg-ów",
   "main": "main.js",
   "scripts": {
@@ -10,10 +10,10 @@
   "license": "MIT",
   "private": true,
   "devDependencies": {
-    "ava": "^0.16.0",
-    "eslint": "^3.3.1",
-    "eslint-plugin-ava": "^3.0.0",
-    "longjohn": "^0.2.11"
+    "ava": "^0.22.0",
+    "eslint": "^4.5.0",
+    "eslint-plugin-ava": "^4.2.2",
+    "rewire": "^2.5.2"
   },
   "eslintConfig": {
     "plugins": [
@@ -22,9 +22,8 @@
     "extends": "plugin:ava/recommended"
   },
   "dependencies": {
-    "exif-parser": "^0.1.9",
+    "exif-parser": "^0.1.12",
     "graceful-fs": "^4.1.11",
-    "moment": "^2.18.1",
-    "rewire": "^2.5.2"
+    "moment": "^2.18.1"
   }
 }
