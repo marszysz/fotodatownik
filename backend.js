@@ -326,7 +326,7 @@ function dirRenameMap (outerDir, options, callback) {
     }
 }
 
-// Executes renaming of files or directories passed as a map object.
+// Executes renaming of files or directories passed as a map object: {old: new, ...}.
 // Refuses to replace an existing file.
 // Calls callback with an object mapping filenames to failure messages (if any).
 function renameFiles (renameMap, callback) {
@@ -359,4 +359,4 @@ function renameFiles (renameMap, callback) {
 // TODO: what about *.thm files and associated objects, especially videos?
 // Also, videos without *.thm files, having their dates only in fs attributes...
 
-// TODO: suspicious cases (very old dates, subdirs with photos and another subdirs)
+// TODO: suspicious cases (very old dates, subdirs containing both photos and another subdirs)

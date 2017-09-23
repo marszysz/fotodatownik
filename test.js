@@ -158,14 +158,22 @@ const fileExists = function (fn) {
     return true;
 };
 var renameFiles = backend.__get__('renameFiles');
+test.cb("renameFiles should fail if the source doesn't exist", t => {
+    var srcFile = 'testdir-exec/nothing';
+    renameFiles({[srcFile]: 'testdir-exec/doesnotexist'}, errList => {
+        t.true(errList.hasOwnProperty(srcFile));
+        t.end();
+    });
+});
 test.cb("renameFiles should rename files, but only if the target doesn't exist", t => {
     // testdir/d is a 0-byte file, testdir/e is a directory
     // testRename renames 1st arg to 2nd and back again, 1st should exist, 2nd shouldn't
-    testRename('testdir/d', 'testdir/d.renamed');
-    testRename('etdr/e', 'testdir/e.renamed');
+    testRename('testdir-exec/d', 'testdir-exec/d.renamed');
+    testRename('testdir-exec/e', 'testdir-exec/e.renamed');
     function testRename (fn1, fn2) {
-        renameFiles({'testdir/blah': fn1}, errList => {
-            t.deepEqual(errList, {'testdir/blah': 'target exists'}, 'should deny replacing an existing file');
+        var nofile = 'testdir-exec/doesnotexist';
+        renameFiles({[nofile]: fn1}, errList => {
+            t.deepEqual(errList, {[nofile]: 'target exists'}, 'should deny replacing an existing file');
             t.end();
         });
         renameFiles({[fn1]: fn2}, errList => {
