@@ -4,6 +4,7 @@ import test from 'ava';  // AVA insists on ES6 export/import
  
 const rewire = require('rewire');
 const backend = rewire('./backend');
+const fs = require('graceful-fs');
 
 var listFiles = backend.__get__('listFiles');
 test('listFiles should return proper file list filtered by the supplied function', t => {
@@ -160,24 +161,17 @@ const fileExists = function (fn) {
 var renameFiles = backend.__get__('renameFiles');
 test.cb("renameFiles should fail if the source doesn't exist", t => {
     var srcFile = 'testdir-exec/nothing';
-    renameFiles({[srcFile]: 'testdir-exec/doesnotexist'}, errList => {
+    renameFiles({[srcFile]: 'testdir-exec/nevermind'}, errList => {
         t.true(errList.hasOwnProperty(srcFile));
         t.end();
     });
 });
-test.cb("renameFiles should rename files, but only if the target doesn't exist", t => {
-    // testdir/d is a 0-byte file, testdir/e is a directory
-    // testRename renames 1st arg to 2nd and back again, 1st should exist, 2nd shouldn't
-    testRename('testdir-exec/d', 'testdir-exec/d.renamed');
-    testRename('testdir-exec/e', 'testdir-exec/e.renamed');
-    function testRename (fn1, fn2) {
-        var nofile = 'testdir-exec/doesnotexist';
-        renameFiles({[nofile]: fn1}, errList => {
-            t.deepEqual(errList, {[nofile]: 'target exists'}, 'should deny replacing an existing file');
-            t.end();
-        });
+function testRename (t, fn1, fn2) {  // test macro for renaming back and forth
+    var nofile = 'testdir-exec/doesnotexist';
+    t.plan(6);
+    renameFiles({[nofile]: fn1}, errList => {
+        t.deepEqual(errList, {[nofile]: 'target exists'}, 'should deny replacing an existing file');
         renameFiles({[fn1]: fn2}, errList => {
-            t.plan(5);
             t.deepEqual(errList, {}, 'Renaming should succeed');
             t.true(fileExists(fn2), 'The renamed file should exist');
             renameFiles({[fn2]: fn1}, errList => {
@@ -187,5 +181,12 @@ test.cb("renameFiles should rename files, but only if the target doesn't exist",
                 t.end();
             });
         });
-    }
     });
+}
+// testRename renames 1st arg to 2nd and back again, 1st should exist, 2nd shouldn't
+test.cb("renameFiles should rename files, but only if the target doesn't exist", 
+        testRename, 'testdir-exec/d', 'testdir-exec/d.renamed'); // 0-byte file
+
+test.cb("renameFiles should also rename directories the same way",
+        testRename, 'testdir-exec/e', 'testdir-exec/e.renamed'); // directory
+
