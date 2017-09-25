@@ -1,13 +1,33 @@
-<html>
+<!DOCTYPE html>
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Fotodatownik</title>    
+    <link href="index.css" rel="stylesheet" type="text/css"/>
+    <title>Fotodatownik</title>
 </head> 
 <body>
     <div id='main'>
-        <button id='renameFiles'>
-            Zmień nazwy plików w folderze...
-        </button>
+        <fieldset>
+            <button id='renameFiles'>
+                Zmień nazwy plików w folderze...
+            </button>
+            <p class="description">
+                Zmienia nazwy plików w wybranym folderze.<br>
+                Każdy plik otrzymuje nazwę złożoną z daty wykonania zdjęcia i ewentualnego opisu
+                zawartego w dotychczasowej nazwie.
+            </p>
+        </fieldset>
+        <fieldset>
+            <button id="renameDirs">
+                Zmień nazwy podfolderów w folderze...
+            </button>
+            <p class="description">
+                Zmienia nazwy podfolderów wybranego folderu.<br>
+                Każdy podfolder otrzymuje nazwę złożoną z daty lub zakresu dat w których
+                wykonano zjęcia w nim zawarte.
+            </p>
+        </fieldset>
     </div>
+    <script src="index.js"></script>
 </body>
 </html>

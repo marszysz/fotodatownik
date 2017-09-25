@@ -1,0 +1,21 @@
+body {
+    background-color: #E7E7E7;
+}
+#main {
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
+    height: 100%;
+    padding: 20px;
+    font-size: 1rem;
+}
+#main p {
+    font: inherit;
+}
+
+button {
+    font-size: inherit;
+}
+
+fieldset {
+    margin-bottom: 2em;
+}

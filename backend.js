@@ -1,6 +1,7 @@
 'use strict';
 
 // Main functions: fileRenameMap, dirRenameMap, renameFiles
+exports = {fileRenameMap, dirRenameMap, renameFiles};
 
 const fs = require ('graceful-fs');
 const exifParser = require('exif-parser');
@@ -355,6 +356,8 @@ function renameFiles (renameMap, callback) {
         }
     }
 }
+
+// TODO: add an entry to file/dir rename map only when source and destination differs
 
 // TODO: what about *.thm files and associated objects, especially videos?
 // Also, videos without *.thm files, having their dates only in fs attributes...

@@ -20,7 +20,7 @@ function createMainWindow() {
 
 	win.loadURL(`file://${__dirname}/app/index.html`);
 	win.on('closed', onClosed);
-	win.setMenu(null);
+	// win.setMenu(null);
 
 	return win;
 }
@@ -40,3 +40,6 @@ app.on('activate', () => {
 app.on('ready', () => {
 	mainWindow = createMainWindow();
 });
+
+// TODO: use Photon
+// TODO: find about possibility of cross-platform shell integration
