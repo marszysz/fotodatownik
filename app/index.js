@@ -7,8 +7,8 @@ function renameFiles () {
     var dir = dialog.showOpenDialog({
         title: 'Wybierz folder',
         properties: ['openDirectory']
-    });
-    backend.fileRenameMap(dir, f => f, {}, fileList => console.log);
+    })[0];
+    backend.fileRenameMap(dir, f => f, {}, console.log);
 }
 
 document.getElementById('renameFiles').addEventListener('click', renameFiles);

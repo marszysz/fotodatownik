@@ -1,16 +1,19 @@
 'use strict';
 
-// Main functions: fileRenameMap, dirRenameMap, renameFiles
-exports = {fileRenameMap, dirRenameMap, renameFiles};
+module.exports = {fileRenameMap, dirRenameMap, renameFiles};
 
 const fs = require ('graceful-fs');
 const exifParser = require('exif-parser');
 const moment = require('moment');
 
-const util = require ('./util.js');
+const util = require ('./util');
 
 function listFiles (dir, filterFunc) {
     return fs.readdirSync(dir).filter(filterFunc);
+}
+// checks if the file is a directory OR a symlink to a directory
+function isDirectory (fn) {
+    return fs.statSync(fn).isDirectory();
 }
 
 // reads `date taken` from fileName (full path) and passes it to callback
@@ -58,14 +61,18 @@ function getExifDate (fileName, callback) {
         var exifDate = result && result.tags.DateTimeOriginal ?
             new Date(result.tags.DateTimeOriginal * 1000) :
             null;
-        var msg;
+        var msg = null;
         if (!exifDate) {
             msg = 'EXIF date not present or EXIF unreadable in file: ';
         }
-        else {
-            msg = 'Done with a file: ';
+        function logFileErr (err) {
+            return function (closeErr) {
+                if(err || closeErr) {
+                    console.log(err ? err : '', fileName, closeErr ? ' (error on closing)' : '');
+                }
+            };
         }
-        fs.close(fileDescriptor, error => console.log(msg + fileName, error ? ' (error on closing)' : ''));
+        fs.close(fileDescriptor, logFileErr(msg));
         callback(exifDate);
         return;
     }
@@ -187,8 +194,12 @@ function extractTitle (fileName) {
     followed by a number.
     The file extension is "JPG" for Exif files and "THM" for Exif files that represent thumbnails
     of other files than "JPG".
+
+    The ultimate online tool for analysing that terrible thing below: https://regex101.com/
+    The regex consists of 4 alternative subpatterns: 1st for dates in filenames,
+    2nd for DCF filenames, 3rd for DCF directory names, and 4th for dates and date ranges in dirnames
     */
-    var baseNamePattern = /^\w{4}\d+|\d{3}\w{5}|\d{4}\W?\d\d\W?\d\d(-(((\d{4}\W?)?\d\d\W?)?\d\d))?/;
+    var baseNamePattern = /\s?\d{4}\D?\d\d\D?\d\d((\D?\d\d){2,3})?|^\w{4}\d+|^\d{3}\w{5}|\d{4}\W?\d\d\W?\d\d(-(((\d{4}\W?)?\d\d\W?)?\d\d))?/g;
     return fileName.replace(baseNamePattern, '');
 }
 
@@ -197,7 +208,7 @@ function extractTitle (fileName) {
 function fileRenameMap (dir, filterFunc, options, callback) {
     if(!callback) throw 'Empty callback';
 
-    var fileList = listFiles(dir, filterFunc);
+    var fileList = listFiles(dir, filterFunc).filter(f => ! isDirectory(dir + '/' + f));
     fileDateMap(dir, fileList, generateRenameMap);
     
     function generateRenameMap (dateMap) {
@@ -302,7 +313,7 @@ function makeNewDirName (oldName, dateRange, options) {
 // Generates an object mapping current dir names to their new names and calls callback with it.
 // Passes options object to makeNewDirName.
 function dirRenameMap (outerDir, options, callback) {
-    var dirList = fs.readdirSync(outerDir).filter(fn => fs.statSync(outerDir + '/' + fn).isDirectory());
+    var dirList = fs.readdirSync(outerDir).filter(fn => isDirectory(outerDir + '/' + fn));
     var dirDateMap = {'pending': dirList.length};
     Object.defineProperty(dirDateMap, 'baseDir', {value: outerDir, enumerable: false});
     dirList.forEach(dirName => {

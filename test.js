@@ -62,6 +62,7 @@ test('extractTitle should return a title (including file extension) extracted fr
     t.is(extractTitle('bździągwa'), 'bździągwa');
     t.is(extractTitle('IMG_1234.jpg'), '.jpg');
     t.is(extractTitle('1.jpg'), '1.jpg');
+    t.is(extractTitle('2017-01-08_13.18.27.jpg'), '.jpg');
 });
 
 var makeNewFileName = backend.__get__('makeNewFileName');
