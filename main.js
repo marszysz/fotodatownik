@@ -44,3 +44,5 @@ app.on('ready', () => {
 
 // TODO: use Photon
 // TODO: find about possibility of cross-platform shell integration
+
+// TODO: undo history stored in settings?
