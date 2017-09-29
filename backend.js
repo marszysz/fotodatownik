@@ -220,7 +220,7 @@ function fileRenameMap (dir, filterFunc, options, callback) {
                 result[fileName] = null;
             }
         });
-        callback(result);
+        callback(util.filterObject(result, fn => fn !== result[fn]));
     }
 }
 
@@ -334,7 +334,7 @@ function dirRenameMap (outerDir, options, callback) {
         Object.keys(dirDateMap).forEach(dirName => {
             dirRenameMap[dirName] = makeNewDirName(dirName, dirDateMap[dirName], options);
         });
-        callback(dirRenameMap);
+        callback(util.filterObject(dirRenameMap, fn => fn !== dirRenameMap[fn]));
     }
 }
 
@@ -368,9 +368,9 @@ function renameFiles (renameMap, callback) {
     }
 }
 
-// TODO: add an entry to file/dir rename map only when source and destination differs
-
 // TODO: what about *.thm files and associated objects, especially videos?
 // Also, videos without *.thm files, having their dates only in fs attributes...
 
 // TODO: suspicious cases (very old dates, subdirs containing both photos and another subdirs)
+
+// TODO: option to ignore existing titles in file names (important)
