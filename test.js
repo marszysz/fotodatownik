@@ -1,5 +1,5 @@
 /* eslint-disable quotes */
-/*jshint multistr:true */
+
 import test from 'ava';  // AVA insists on ES6 export/import
  
 const rewire = require('rewire');
@@ -93,7 +93,7 @@ test.cb('fileRenameMap should pass an object which maps existing filenames to ne
 var extractDirDateRange = backend.__get__('extractDirDateRange');
 test.cb("extractDirDateRange should pass null if a given directory doesn't contain jpeg files with EXIF dates \
     or isn't accesible.", t => {
-    extractDirDateRange('testdir/empty', fn => true, result => {
+    extractDirDateRange('testdir/empty', () => true, result => {
         t.is(result, null);
         t.end();
     });
@@ -111,7 +111,7 @@ test.cb('extractDirDateRange should pass an array of 2 dates even if dir has 1 f
     });
 });
 test.cb("extractDirDateRange should pass null if it doesn't have any files to work on", t => {
-    extractDirDateRange('testdir/100TEST_', fn => false, result => {
+    extractDirDateRange('testdir/100TEST_', () => false, result => {
         t.is(result, null);
         t.end();
     });

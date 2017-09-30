@@ -57,7 +57,9 @@ function getExifDate (fileName, callback) {
         try {
             result = parser.parse();
         }
-        catch (err) {}
+        catch (err) {
+            console.warn('Error parsing EXIF in ' + fileName);
+        }
         var exifDate = result && result.tags.DateTimeOriginal ?
             new Date(result.tags.DateTimeOriginal * 1000) :
             null;
@@ -98,7 +100,7 @@ function fileDateMap (dir, fileArray, callback) {
         result[fileName] = date;
         if (--result.filesPending === 0) {
             delete result.filesPending;
-            callback(result);
+            return callback(result);
         }
     }
 }
@@ -288,7 +290,7 @@ function makeNewDirName (oldName, dateRange, options) {
         if(src.y === src.y2) {
             y2s = '';            
         } else {
-            y2s = src.y2 + src.ds;            
+            y2s = src.y2 + src.ds;
         }
         var m2s;
         if(src.y === src.y2 && src.m === src.m2) {
@@ -363,7 +365,7 @@ function renameFiles (renameMap, callback) {
             failures[fn] = err.message;
         }
         if (--pending === 0) {
-            callback(failures);
+            return callback(failures);
         }
     }
 }

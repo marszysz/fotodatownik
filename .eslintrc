@@ -1,7 +1,7 @@
 {
   "parserOptions": {
-    "ecmaVersion": 7,
-    "sourceType": "module"
+    "ecmaVersion": 7, // ES7 == ES2016
+    "sourceType": "module" // 'module' is for ES modules, we use node's CommonJS modules
   },
   "env": {  //enabled environments
     "node": true,
@@ -11,15 +11,19 @@
     //place settings for globals here, such as
     //"exampleGlobalVariable": true
   },
+  "extends": "eslint:recommended",
   "rules": {
     //enable ESLint rules
-    "quotes": [2, "single", {"avoidEscape": true, "allowTemplateLiterals": false}],
-    "eqeqeq": [1, "smart"],
-    "curly": [2, "multi-line", "consistent"],
-    "eol-last": 0,
-    "no-nested-ternary": 1,
-    "padded-blocks": [1, "never"],
-    "space-before-blocks": [1, "always"]
+    "no-console": "off",
+    "callback-return": "warn",
+    "quotes": ["error", "single", {"avoidEscape": true, "allowTemplateLiterals": false}],
+    "eqeqeq": ["warn", "smart"],
+    "curly": ["error", "multi-line", "consistent"],
+    "eol-last": "off",
+    "no-nested-ternary": "warn",
+    "padded-blocks": ["warn", "never"],
+    "space-before-blocks": ["warn", "always"],
+    "semi": "error"
   },
   "plugins": [
     //you can put plugins here
