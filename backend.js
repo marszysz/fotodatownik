@@ -222,7 +222,9 @@ function fileRenameMap (dir, filterFunc, options, callback) {
                 result[fileName] = null;
             }
         });
-        callback(util.filterObject(result, fn => fn !== result[fn]));
+        var filteredResult = util.filterObject(result, fn => fn !== result[fn]);
+        Object.defineProperty(filteredResult, 'baseDir', {value: dir, enumerable: false});
+        callback(filteredResult);
     }
 }
 
