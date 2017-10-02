@@ -23,7 +23,7 @@
     "no-nested-ternary": "warn",
     "padded-blocks": ["warn", "never"],
     "space-before-blocks": ["warn", "always"],
-    "semi": "error"
+    "semi": ["error", "always", {"omitLastInOneLineBlock": true}]
   },
   "plugins": [
     //you can put plugins here

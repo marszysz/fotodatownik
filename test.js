@@ -125,7 +125,7 @@ test("makeNewDirName should return a new dir name made from an old name, an arra
         ['2016-12-31T20:00:00.000Z', '2017-01-01T03:00:00.000Z', '2016.12.31-2017.01.01'],
         ['2016-12-31T20:00:00.000Z', '2016-12-31T00:00:00.000Z', '2016.12.31'],
     ];
-    testData.forEach(data => {t.is(makeNewDirName('100TEST_', [new Date(data[0]), new Date(data[1])], {}), data[2]);});
+    testData.forEach(data => {t.is(makeNewDirName('100TEST_', [new Date(data[0]), new Date(data[1])], {}), data[2])});
     let opts = {
         dateSeparator: '--',
         rangeSeparator: '::',
