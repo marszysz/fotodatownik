@@ -1,8 +1,9 @@
 body {
     background-color: #E7E7E7;
+    font-family: caption;
 }
 #main {
-    position: absolute;
+    position: fixed;
     -webkit-user-select: none;
     -webkit-app-region: drag;
     height: 100%;

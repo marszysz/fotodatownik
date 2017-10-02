@@ -6,8 +6,9 @@ ipc.once('passData', makeTable);
 function makeTable (event, data) {
     var table = document.getElementById('changeList');
     Object.keys(data).forEach(src => {
+        let dest = data[src] ? data[src] : 'Bez zmiany - data nieznana';
         let row = document.createElement('tr');
-        row.innerHTML = `<td>${src}</td><td>${data[src]}</td>`;
+        row.innerHTML = `<td>${src}</td><td>${dest}</td>`;
         table.appendChild(row);
     });
     ['ok', 'cancel'].forEach(msg => {
