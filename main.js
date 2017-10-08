@@ -42,7 +42,7 @@ app.on('ready', () => {
 	mainWindow = createMainWindow();
 });
 
-// TODO: use Photon
+// TODO: use Photon or Quasar or CSS Grid Layout (at a pinch)
 // TODO: find about possibility of cross-platform shell integration
 
 // TODO: undo history stored in settings?
