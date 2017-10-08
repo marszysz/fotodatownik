@@ -3,7 +3,8 @@
 #main {
     display: flex;
     flex-flow: column;
-    height: calc(100% - 3em);
+    height: calc(100% - 40px - 1em);
+    width: calc(100% - 40px);
 }
 
 div.table-container {
@@ -16,8 +17,32 @@ div.table-container {
 
 table {
     font-size: smaller;
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+table#legend {
+    width: calc(100% - 15px);
+    border-bottom: 1px solid gray;
+}
+
+table#changeList {
+    height: 100%;
+}
+
+th, td {
+    width: 50%;
 }
 
 th {
     color: darkred;
+}
+
+th:first-child, td:first-child {
+    border-right: 1px solid gray;
+}
+
+tr:nth-child(even) {
+    background: rgba(169, 169, 169, 0.3);
 }
