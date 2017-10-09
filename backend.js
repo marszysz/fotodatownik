@@ -107,7 +107,7 @@ function fileDateMap (dir, fileArray, callback) {
 
 /* Composes a new file name from the old one, a date object and options object.
 Uses makeNewName to parse dates and apply options, passes it compose function
-which actually composes the date part of a new filename.
+which actually composes a new filename.
 Options with defaults:
 dateSeparator: '.'  - separator of date parts
 timeSeparator: '.'  - separator of time parts
@@ -117,7 +117,18 @@ includeTitle: true - whether the new file name should include the title extracte
 function makeNewFileName (oldFileName, fileDate, options) {
     if(fileDate === null) return null;
 
-    var compose = (src => [src.y, src.ds, src.m, src.ds, src.d, src.dts, src.h, src.ts, src.M, src.ts, src.s].join(''));
+    function compose (src) {
+        if(options.hasOwnProperty('includeTitle') && ! options.includeTitle) {
+            let fileExt = src.title.match(/\..+?$/g);
+            src.title = fileExt ? fileExt[0] : '';
+        }
+        return [
+            src.y, src.ds, src.m, src.ds, src.d,
+            src.dts,
+            src.h, src.ts, src.M, src.ts, src.s,
+            src.title
+        ].join('');
+    }
 
     return makeNewName(oldFileName, fileDate, options, compose);
 }
@@ -137,7 +148,8 @@ dts - date-time separator (separates date from time),
 rs - range separator (separates a date from another one or its part),
 y2 - year of the last contained file,
 m2 - month of the last contained file,
-d2 - day of the last contained file.
+d2 - day of the last contained file,
+title - a title extracted from the original file name.
 */
 function makeNewName (oldName, dates, options, composeFunc) {
     if(! oldName) throw('Missing oldName argument');
@@ -176,12 +188,8 @@ function makeNewName (oldName, dates, options, composeFunc) {
     src.h = padTo2(date1.getUTCHours());
     src.M = padTo2(date1.getUTCMinutes());
     src.s = padTo2(date1.getUTCSeconds());
-    var datePart = composeFunc(src);
     
-    function getTitle (fileName, optionsObj) {
-        if(optionsObj.hasOwnProperty('includeTitle') && !optionsObj.includeTitle) {
-            return '';
-        }
+    function getTitle (fileName) {
         // if the title starts with a letter or number, direct appending to the date would be unpleasant
         // (this method is Unicode-safe)
         var title = extractTitle(fileName);
@@ -190,7 +198,9 @@ function makeNewName (oldName, dates, options, composeFunc) {
         }
         return title;
     }
-    return datePart + getTitle(oldName, options);
+    src.title = getTitle(oldName);
+
+    return composeFunc(src);
 }
 
 /* Extracts and returns file/dir title from a given file/dir name, if there is one,
