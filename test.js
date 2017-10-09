@@ -73,9 +73,10 @@ test('makeNewFileName should compose a new file name based on the old name, file
     let opts = {
         dateSeparator: '',
         timeSeparator: ':',
-        dateTimeSeparator: '-'
+        dateTimeSeparator: '-',
+        includeTitle: false
     };
-    t.is(makeNewFileName('DCIM1234 sth.jpg', new Date('2016-01-01T00:00:00.999Z'), opts), '20160101-00:00:00 sth.jpg');
+    t.is(makeNewFileName('DCIM1234 sth.jpg', new Date('2016-01-01T00:00:00.999Z'), opts), '20160101-00:00:00.jpg');
 });
 
 var fileRenameMap = backend.__get__('fileRenameMap');
@@ -129,11 +130,15 @@ test("makeNewDirName should return a new dir name made from an old name, an arra
     let opts = {
         dateSeparator: '--',
         rangeSeparator: '::',
-        dayStart: '04'
+        dayStart: '04',
+        includeTitle: true
     };
     t.is(makeNewDirName('100TEST_', [new Date(testData[2][0]), new Date(testData[2][1])], opts), '2016--12--31');
     t.is(makeNewDirName('100TEST_-abc', [new Date(testData[1][0]), new Date(testData[1][1])], opts), '2016--01--01::02--02-abc');
+    t.is(makeNewDirName('100TEST_-abc', [new Date(testData[1][0]), new Date(testData[1][1])],
+        Object.assign({}, opts, {includeTitle: false})), '2016--01--01::02--02');
     t.is(makeNewDirName('100TEST_ teścior', [new Date(testData[1][0]), new Date(testData[1][1])], {}), '2016.01.01-02.02 teścior');
+    t.is(makeNewDirName('100TEST_ teścior', [new Date(testData[1][0]), new Date(testData[1][1])], {includeTitle: false}), '2016.01.01-02.02');
 });
 
 var dirRenameMap = backend.__get__('dirRenameMap');
