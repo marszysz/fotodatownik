@@ -299,8 +299,9 @@ function extractDirDateRange (dir, filterFunc, callback) {
 /* Returns a new name for a directory based on old name, date range (array of 2 dates) and options.
 Options with defaults:
 dateSeparator: '.'  - separator of date parts
-rangeSeparator: '-'  - separates the first date from (a part of) the second one  
-dayStart: 0  -  hour which starts a new day (any date with hour < dayStart will be converted to the preceding day) 
+rangeSeparator: '-'  - separates the first date from (a part of) the second one
+dayStart: 0  -  hour which starts a new day (any date with hour < dayStart will be converted to the preceding day)
+includeTitle: true - whether new dir names should include titles extracted from old ones
 */
 function makeNewDirName (oldName, dateRange, options) {
     if(dateRange === null) return null;
@@ -329,7 +330,21 @@ function makeNewDirName (oldName, dateRange, options) {
             d2 = src.d2;
             rs = src.rs;                
         }
-        return [src.y, src.ds, src.m, src.ds, src.d, rs, y2s, m2s, d2].join('');
+        if(options.hasOwnProperty('includeTitle') && ! options.includeTitle) {
+            src.title = '';
+        }
+        return [
+            src.y,
+            src.ds,
+            src.m,
+            src.ds,
+            src.d,
+            rs,
+            y2s,
+            m2s,
+            d2,
+            src.title
+        ].join('');
     };
     return makeNewName(oldName, dateRange, options, compose);
 }
