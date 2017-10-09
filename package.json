@@ -27,6 +27,7 @@
   "dependencies": {
     "exif-parser": "^0.1.12",
     "graceful-fs": "^4.1.11",
+    "htmlspecialchars": "^1.0.5",
     "moment": "^2.18.1"
   }
 }

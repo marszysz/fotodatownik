@@ -46,3 +46,7 @@ th:first-child, td:first-child {
 tr:nth-child(even) {
     background: rgba(169, 169, 169, 0.3);
 }
+
+span.special {
+    font-style: italic;
+}
