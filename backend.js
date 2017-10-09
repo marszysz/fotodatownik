@@ -106,15 +106,29 @@ function fileDateMap (dir, fileArray, callback) {
 }
 
 /* Composes a new file name from the old one, a date object and options object.
-options with defaults:
+Uses makeNewName to parse dates and apply options, passes it compose function
+which actually composes a new filename.
+Options with defaults:
 dateSeparator: '.'  - separator of date parts
 timeSeparator: '.'  - separator of time parts
 dateTimeSeparator: '_'  - separates date from time
+includeTitle: true - whether the new file name should include the title extracted from the old one
 */
 function makeNewFileName (oldFileName, fileDate, options) {
     if(fileDate === null) return null;
 
-    var compose = (src => [src.y, src.ds, src.m, src.ds, src.d, src.dts, src.h, src.ts, src.M, src.ts, src.s].join(''));
+    function compose (src) {
+        if(options.hasOwnProperty('includeTitle') && ! options.includeTitle) {
+            let fileExt = src.title.match(/\..+?$/g);
+            src.title = fileExt ? fileExt[0] : '';
+        }
+        return [
+            src.y, src.ds, src.m, src.ds, src.d,
+            src.dts,
+            src.h, src.ts, src.M, src.ts, src.s,
+            src.title
+        ].join('');
+    }
 
     return makeNewName(oldFileName, fileDate, options, compose);
 }
@@ -134,7 +148,8 @@ dts - date-time separator (separates date from time),
 rs - range separator (separates a date from another one or its part),
 y2 - year of the last contained file,
 m2 - month of the last contained file,
-d2 - day of the last contained file.
+d2 - day of the last contained file,
+title - a title extracted from the original file name.
 */
 function makeNewName (oldName, dates, options, composeFunc) {
     if(! oldName) throw('Missing oldName argument');
@@ -173,14 +188,19 @@ function makeNewName (oldName, dates, options, composeFunc) {
     src.h = padTo2(date1.getUTCHours());
     src.M = padTo2(date1.getUTCMinutes());
     src.s = padTo2(date1.getUTCSeconds());
-    var datePart = composeFunc(src);
-    var title = extractTitle(oldName);
-    // if the title starts with a letter or number, direct appending to the date would be unpleasant
-    // (this method is Unicode-safe)
-    if(title && (title[0].toLowerCase() !== title[0].toUpperCase() || /\d/.test(title[0]))) {
-        title = ' ' + title;
+    
+    function getTitle (fileName) {
+        // if the title starts with a letter or number, direct appending to the date would be unpleasant
+        // (this method is Unicode-safe)
+        var title = extractTitle(fileName);
+        if(title && (title[0].toLowerCase() !== title[0].toUpperCase() || /\d/.test(title[0]))) {
+            title = ' ' + title;
+        }
+        return title;
     }
-    return datePart + title; 
+    src.title = getTitle(oldName);
+
+    return composeFunc(src);
 }
 
 /* Extracts and returns file/dir title from a given file/dir name, if there is one,
@@ -279,8 +299,9 @@ function extractDirDateRange (dir, filterFunc, callback) {
 /* Returns a new name for a directory based on old name, date range (array of 2 dates) and options.
 Options with defaults:
 dateSeparator: '.'  - separator of date parts
-rangeSeparator: '-'  - separates the first date from (a part of) the second one  
-dayStart: 0  -  hour which starts a new day (any date with hour < dayStart will be converted to the preceding day) 
+rangeSeparator: '-'  - separates the first date from (a part of) the second one
+dayStart: 0  -  hour which starts a new day (any date with hour < dayStart will be converted to the preceding day)
+includeTitle: true - whether new dir names should include titles extracted from old ones
 */
 function makeNewDirName (oldName, dateRange, options) {
     if(dateRange === null) return null;
@@ -309,7 +330,21 @@ function makeNewDirName (oldName, dateRange, options) {
             d2 = src.d2;
             rs = src.rs;                
         }
-        return [src.y, src.ds, src.m, src.ds, src.d, rs, y2s, m2s, d2].join('');
+        if(options.hasOwnProperty('includeTitle') && ! options.includeTitle) {
+            src.title = '';
+        }
+        return [
+            src.y,
+            src.ds,
+            src.m,
+            src.ds,
+            src.d,
+            rs,
+            y2s,
+            m2s,
+            d2,
+            src.title
+        ].join('');
     };
     return makeNewName(oldName, dateRange, options, compose);
 }

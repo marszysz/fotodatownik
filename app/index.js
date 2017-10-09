@@ -21,6 +21,7 @@ function renameFiles() {
             timeSeparator: '.',
             dateTimeSeparator: ' '
         };
+        opts.includeTitle = document.getElementById('fileTitles').checked;
         backend.fileRenameMap(dir, fn => /\.jpe?g$/i.test(fn), opts, confirmRename);
     }
 }
