@@ -376,5 +376,3 @@ function renameFiles (renameMap, callback) {
 // Also, videos without *.thm files, having their dates only in fs attributes...
 
 // TODO: suspicious cases (very old dates, subdirs containing both photos and another subdirs)
-
-// TODO: option to ignore existing titles in file names (important)
