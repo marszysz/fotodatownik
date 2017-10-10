@@ -8,7 +8,7 @@
 }
 
 div.table-container {
-    overflow-y: auto;
+    overflow-y: scroll;
     height: 100%;
     width: 100%;
     margin-bottom: 1em;
@@ -27,9 +27,9 @@ table#legend {
     border-bottom: 1px solid gray;
 }
 
-table#changeList {
+/* table#changeList {
     height: 100%;
-}
+} */
 
 th, td {
     width: 50%;

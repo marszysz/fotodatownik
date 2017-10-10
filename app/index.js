@@ -6,16 +6,9 @@ const util = require('../util');
 const path = require('path');
 
 document.getElementById('renameFiles').addEventListener('click', renameFiles);
-function renameFiles() {
-    var resp = remote.dialog.showOpenDialog(
-        remote.getCurrentWindow(),
-        {
-            title: 'Wybierz folder',
-            properties: ['openDirectory']
-        }
-    );
-    if (resp) {
-        var dir = resp[0];
+function renameFiles () {
+    var dir = selectDir();
+    if (dir) {
         var opts = {
             dateSeparator: '-',
             timeSeparator: '.',
@@ -26,7 +19,32 @@ function renameFiles() {
     }
 }
 
-function openDialogWindow() {
+document.getElementById('renameDirs').addEventListener('click', renameDirs);
+function renameDirs () {
+    var dir = selectDir();
+    if (dir) {
+        var opts = {
+            dateSeparator: '.',
+            rangeSeparator: '-',
+            dayStart: 0
+        };
+        opts.includeTitle = document.getElementById('dirTitles').checked;
+        backend.dirRenameMap(dir, opts, confirmRename);
+    }
+}
+
+function selectDir () {
+    var resp = remote.dialog.showOpenDialog(
+        remote.getCurrentWindow(),
+        {
+            title: 'Wybierz folder',
+            properties: ['openDirectory']
+        }
+    );
+    return resp ? resp[0] : null;
+}
+
+function openDialogWindow () {
     var dialogWindow = new remote.BrowserWindow({
         width: 700,
         height: 500,
