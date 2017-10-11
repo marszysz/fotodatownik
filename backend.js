@@ -226,7 +226,8 @@ function extractTitle (fileName) {
 }
 
 // Generates an object which maps filenames to their new names and calls callback with it.
-// Takes a directory name, filename filter function and options object for makeNewFileName.  
+// Takes a directory name, filename filter function and options object for makeNewFileName.
+// The generated map includes a non-enumerable property baseDir indicating base directory of the files.
 function fileRenameMap (dir, filterFunc, options, callback) {
     if(!callback) throw 'Empty callback';
 
@@ -351,6 +352,7 @@ function makeNewDirName (oldName, dateRange, options) {
 
 // Generates an object mapping current dir names to their new names and calls callback with it.
 // Passes options object to makeNewDirName.
+// The generated map includes a non-enumerable property baseDir indicating the base directory of operation.
 function dirRenameMap (outerDir, options, callback) {
     var dirList = fs.readdirSync(outerDir).filter(fn => isDirectory(outerDir + '/' + fn));
     var dirDateMap = {'pending': dirList.length};
@@ -373,7 +375,9 @@ function dirRenameMap (outerDir, options, callback) {
         Object.keys(dirDateMap).forEach(dirName => {
             dirRenameMap[dirName] = makeNewDirName(dirName, dirDateMap[dirName], options);
         });
-        callback(util.filterObject(dirRenameMap, fn => fn !== dirRenameMap[fn]));
+        var filteredDirRenameMap = util.filterObject(dirRenameMap, fn => fn !== dirRenameMap[fn]);
+        Object.defineProperty(filteredDirRenameMap, 'baseDir', {value: outerDir, enumerable: false});        
+        callback(filteredDirRenameMap);
     }
 }
 

@@ -90,6 +90,13 @@ test.cb('fileRenameMap should pass an object which maps existing filenames to ne
         t.end();
     });
 });
+test.cb('fileRenameMap should include a non-enumerable baseDir property', t => {
+    fileRenameMap('testdir', () => true, {}, result => {
+        t.false(result.propertyIsEnumerable('baseDir'));
+        t.is(result.baseDir, 'testdir');
+        t.end();
+    });
+});
 
 var extractDirDateRange = backend.__get__('extractDirDateRange');
 test.cb("extractDirDateRange should pass null if a given directory doesn't contain jpeg files with EXIF dates \
@@ -152,6 +159,13 @@ test.cb("dirRenameMap should pass an object mapping existing dir names to the ne
     };
     dirRenameMap('testdir', {dayStart: 1}, result => {
         t.deepEqual(result, expected);
+        t.end();
+    });
+});
+test.cb('dirRenameMap should include a non-enumerable baseDir property', t => {
+    dirRenameMap('testdir', {}, result => {
+        t.false(result.propertyIsEnumerable('baseDir'));
+        t.is(result.baseDir, 'testdir');
         t.end();
     });
 });
