@@ -76,7 +76,7 @@ function execRename (renameMap) {
 }
 
 function showErrors (errList) {
-    if(! errList || Object.keys(errList).length === 0) return;
+    if(! errList || Object.keys(errList).length === 0) {alert('Załatwione.'); return}
     remote.dialog.showMessageBox(
         remote.getCurrentWindow(),
         {
