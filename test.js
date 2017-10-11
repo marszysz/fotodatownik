@@ -170,6 +170,7 @@ test.cb('dirRenameMap should include a non-enumerable baseDir property', t => {
     });
 });
 
+// let the execution testing begin
 const fileExists = function (fn) {
     try {
         fs.accessSync(fn);
@@ -180,24 +181,26 @@ const fileExists = function (fn) {
 };
 var renameFiles = backend.__get__('renameFiles');
 test.cb("renameFiles should fail if the source doesn't exist", t => {
-    var srcFile = 'testdir-exec/nothing';
-    renameFiles({[srcFile]: 'testdir-exec/nevermind'}, errList => {
+    var baseDir = 'testdir-exec';
+    var srcFile = 'nothing';
+    renameFiles(baseDir, {[srcFile]: 'nevermind'}, errList => {
         t.true(errList.hasOwnProperty(srcFile));
         t.end();
     });
 });
 function testRename (t, fn1, fn2) {  // test macro for renaming back and forth
-    var nofile = 'testdir-exec/doesnotexist';
+    var baseDir = 'testdir-exec';    
+    var nofile = 'doesnotexist';
     t.plan(6);
-    renameFiles({[nofile]: fn1}, errList => {
+    renameFiles(baseDir, {[nofile]: fn1}, errList => {
         t.deepEqual(errList, {[nofile]: 'target exists'}, 'should deny replacing an existing file');
-        renameFiles({[fn1]: fn2}, errList => {
+        renameFiles(baseDir, {[fn1]: fn2}, errList => {
             t.deepEqual(errList, {}, 'Renaming should succeed');
-            t.true(fileExists(fn2), 'The renamed file should exist');
-            renameFiles({[fn2]: fn1}, errList => {
+            t.true(fileExists(baseDir + '/' + fn2), 'The renamed file should exist');
+            renameFiles(baseDir, {[fn2]: fn1}, errList => {
                 t.deepEqual(errList, {}, 'Renaming back should succeed');
-                t.true(fileExists(fn1), 'The original filename should exist back again');
-                t.false(fileExists(fn2), 'The renamed file should exist no more');
+                t.true(fileExists(baseDir + '/' + fn1), 'The original filename should exist back again');
+                t.false(fileExists(baseDir + '/' + fn2), 'The renamed file should exist no more');
                 t.end();
             });
         });
@@ -205,8 +208,8 @@ function testRename (t, fn1, fn2) {  // test macro for renaming back and forth
 }
 // testRename renames 1st arg to 2nd and back again, 1st should exist, 2nd shouldn't
 test.cb("renameFiles should rename files, but only if the target doesn't exist", 
-        testRename, 'testdir-exec/d', 'testdir-exec/d.renamed'); // 0-byte file
+        testRename, 'd', 'd.renamed'); // 0-byte file
 
 test.cb("renameFiles should also rename directories the same way",
-        testRename, 'testdir-exec/e', 'testdir-exec/e.renamed'); // directory
+        testRename, 'e', 'e.renamed'); // directory
 

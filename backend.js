@@ -381,15 +381,19 @@ function dirRenameMap (outerDir, options, callback) {
     }
 }
 
-// Executes renaming of files or directories passed as a map object: {old: new, ...}.
+// Executes renaming of files or directories passed as a map object: {old: new, ...}
+// contained in the base directory baseDir.
 // Refuses to replace an existing file.
 // Calls callback with an object mapping filenames to failure messages (if any).
-function renameFiles (renameMap, callback) {
+function renameFiles (baseDir, renameMap, callback) {
     var failures = {};
     var pending = Object.keys(renameMap).length;
+    function fullPath (fn) {
+        return baseDir + '/' + fn;
+    }
     Object.keys(renameMap).forEach(fn => renameIfExistsNot(fn));
     function renameIfExistsNot (fn) {
-        fs.access(renameMap[fn], fs.constants.F_OK, err => {
+        fs.access(fullPath(renameMap[fn]), fs.constants.F_OK, err => {
             renameFile(err ? null : new Error('target exists'), fn, renameMap[fn]);
         });
     }
@@ -398,7 +402,7 @@ function renameFiles (renameMap, callback) {
             buildFailureList(err, oldName);
         }
         else {
-            fs.rename(oldName, newName, err => buildFailureList(err, oldName));
+            fs.rename(fullPath(oldName), fullPath(newName), err => buildFailureList(err, oldName));
         }
     }
     function buildFailureList(err, fn) {

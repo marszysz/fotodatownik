@@ -68,10 +68,9 @@ function confirmRename (renameMap) {
 
 function execRename (renameMap) {
     var filteredRenameMap = util.filterObject(renameMap, fn => renameMap[fn] !== null);
-    var dir = renameMap.baseDir + '/';
-    var fullPathRenameMap = util.mapObject(filteredRenameMap, f => [dir + f[0], dir + f[1]]);
     backend.renameFiles(
-        fullPathRenameMap,
+        renameMap.baseDir,
+        filteredRenameMap,
         showErrors
     );
 }
