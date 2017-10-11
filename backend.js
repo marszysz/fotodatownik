@@ -288,7 +288,7 @@ function extractDirDateRange (dir, filterFunc, callback) {
         }
         var out;
         if(dateList.length > 2) {
-            out = dateListSorted.splice(1, dateList.length - 2);
+            out = [dateListSorted[0], dateListSorted[dateListSorted.length - 1]];
         } else {
             out = dateListSorted;
         }
@@ -400,6 +400,7 @@ function renameFiles (renameMap, callback) {
     function buildFailureList(err, fn) {
         if (err) {
             failures[fn] = err.message;
+            console.warn(err.message);
         }
         if (--pending === 0) {
             return callback(failures);
