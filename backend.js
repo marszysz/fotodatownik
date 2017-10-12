@@ -92,8 +92,9 @@ and calls callback with that object
 function fileDateMap (dir, fileArray, callback) {
     if(!callback) throw 'Empty callback';
     var result = {};
-    result.filesPending = fileArray.length;
     Object.defineProperty(result, 'baseDir', {value: dir, enumerable: false});
+    if(fileArray.length === 0) return callback(result);
+    result.filesPending = fileArray.length;
     fileArray.forEach(gatherDates);
   
     function gatherDates (fileName) {
@@ -360,8 +361,8 @@ function makeNewDirName (oldName, dateRange, options) {
 // The generated map includes a non-enumerable property baseDir indicating the base directory of operation.
 function dirRenameMap (outerDir, options, callback) {
     var dirList = fs.readdirSync(outerDir).filter(fn => isDirectory(outerDir + '/' + fn));
+    if(dirList.length === 0) return buildDirRenameMap({});
     var dirDateMap = {'pending': dirList.length};
-    Object.defineProperty(dirDateMap, 'baseDir', {value: outerDir, enumerable: false});
     dirList.forEach(dirName => {
         var dirPath = outerDir + '/' + dirName;
         extractDirDateRange(dirPath, fn => /\.jpe?g$/i.test(fn), buildDirDateMap.bind(this, dirName));   
@@ -375,8 +376,6 @@ function dirRenameMap (outerDir, options, callback) {
     }
     function buildDirRenameMap (dirDateMap) {
         var dirRenameMap = {};
-        Object.defineProperty(dirRenameMap, 'baseDir', {value: outerDir, enumerable: false});
-        
         Object.keys(dirDateMap).forEach(dirName => {
             dirRenameMap[dirName] = makeNewDirName(dirName, dirDateMap[dirName], options);
         });
