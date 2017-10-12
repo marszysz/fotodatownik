@@ -385,6 +385,22 @@ function dirRenameMap (outerDir, options, callback) {
     }
 }
 
+// Handles conflicting renames by adding (n) counter to the conflicting filenames
+function alterConflicting (renameMap) {
+    return util.mapObject(renameMap, entry => {
+        return entry; // wtf? doesn't work
+        
+        let [src, dest] = entry;
+        if(targets.filter(t => t === dest).length > 1) {
+            if(/\(\d\)(\.\w+)?/.test(dest)) {
+                // increase the number, otherwise add it,
+                // but keep track of the number of conflicting files
+                // (maybe: make an object mapping filenames to their conflict count, then resolve)
+            }
+        }
+    });
+}
+
 // Executes renaming of files or directories passed as a map object: {old: new, ...}
 // contained in the base directory baseDir.
 // Refuses to replace an existing file.

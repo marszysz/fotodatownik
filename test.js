@@ -170,6 +170,27 @@ test.cb('dirRenameMap should include a non-enumerable baseDir property', t => {
     });
 });
 
+const alterConflicting = backend.__get__('alterConflicting');
+var input = {
+    'abc': 'abcd',
+    'def.jpg': 'def (1).jpg',
+    'def (1).jpg': 'blah',
+    'ghi.jpeg': 'blah',
+    'jkl.jpg': 'blah'
+};
+var exp = {
+    'abc': 'abcd',
+    'def.jpg': 'def (1).jpg',
+    'def (1).jpg': 'blah',
+    'ghi.jpeg': 'blah (2)',
+    'jkl.jpg': 'blah (3)'
+};
+test("alterConflicting should return an object with the same keys as the input has", t => {
+    t.is(Object.keys(alterConflicting(input)), Object.keys(input));
+});
+test.todo("alterConflicting should return an object with no duplicate values");
+test.todo("alterConflicting should return the proper output for prepared input");
+
 // let the execution testing begin
 const fileExists = function (fn) {
     try {
