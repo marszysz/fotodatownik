@@ -56,6 +56,9 @@ function openDialogWindow () {
 }
 
 function confirmRename (renameMap) {
+    if(Object.keys(renameMap).length === 0) {
+        return alert('Brak zmian do wykonania w wybranym folderze.');
+    }
     var dialogWindow = openDialogWindow();
     dialogWindow.webContents.on('did-finish-load', () => {
         dialogWindow.webContents.send('passData', renameMap);
