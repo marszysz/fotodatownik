@@ -11,9 +11,14 @@ const util = require ('./util');
 function listFiles (dir, filterFunc) {
     return fs.readdirSync(dir).filter(filterFunc);
 }
-// checks if the file is a directory OR a symlink to a directory
+// checks if the file is a directory OR a symlink to a directory;
+// try-catch is for handling broken symlinks - they cause statObj.isDirectory() to throw ENOENT.
 function isDirectory (fn) {
-    return fs.statSync(fn).isDirectory();
+    try {
+        return fs.statSync(fn).isDirectory();
+    } catch (error) {
+        return false;
+    }
 }
 
 // reads `date taken` from fileName (full path) and passes it to callback

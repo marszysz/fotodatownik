@@ -1,5 +1,4 @@
 * handle conflicting renames before showing confirmation dialog
-* fix: a broken symlink crashes directory reading function
 * why doesn't anything appear after selecting a directory with nothing to do? (fix that)
 * make options window and options saving
 * show progress for file/dir reading
