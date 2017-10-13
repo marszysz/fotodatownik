@@ -250,9 +250,9 @@ function fileRenameMap (dir, filterFunc, options, callback) {
                 result[fileName] = null;
             }
         });
-        var filteredResult = util.filterObject(result, fn => fn !== result[fn]);
-        Object.defineProperty(filteredResult, 'baseDir', {value: dir, enumerable: false});
-        callback(filteredResult);
+        var finalResult = alterConflicting(util.filterObject(result, fn => fn !== result[fn]));
+        Object.defineProperty(finalResult, 'baseDir', {value: dir, enumerable: false});
+        callback(finalResult);
     }
 }
 
@@ -380,9 +380,9 @@ function dirRenameMap (outerDir, options, callback) {
         Object.keys(dirDateMap).forEach(dirName => {
             dirRenameMap[dirName] = makeNewDirName(dirName, dirDateMap[dirName], options);
         });
-        var filteredDirRenameMap = util.filterObject(dirRenameMap, fn => fn !== dirRenameMap[fn]);
-        Object.defineProperty(filteredDirRenameMap, 'baseDir', {value: outerDir, enumerable: false});        
-        callback(filteredDirRenameMap);
+        var finalDirRenameMap = alterConflicting(util.filterObject(dirRenameMap, fn => fn !== dirRenameMap[fn]));
+        Object.defineProperty(finalDirRenameMap, 'baseDir', {value: outerDir, enumerable: false});        
+        callback(finalDirRenameMap);
     }
 }
 
@@ -392,8 +392,9 @@ function alterConflicting (renameMap) {
 
     return util.mapObject(renameMap, entry => {
         let [src, dest] = entry;
+        if(dest === null) return entry;
         let destOrd = targetSources[dest].indexOf(src);
-        let ordInd = destOrd === 0 ? '' : ` (${destOrd + 1})`;
+        let ordInd = destOrd === 0 ? '' : ` #${destOrd + 1}`;
         let {name, ext} = path.parse(dest);
         let destResolved = name + ordInd + ext;
         return [src, destResolved];

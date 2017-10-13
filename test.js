@@ -188,14 +188,14 @@ var exp = {
     'jkl.jpg': 'blah (3).jpg'
 };
 let alteredInput = alterConflicting(input);
-test.only("alterConflicting should return an object with the same keys as the input has", t => {
+test("alterConflicting should return an object with the same keys as the input has", t => {
     t.deepEqual(Object.keys(alteredInput), Object.keys(input));
 });
-test.only("alterConflicting should return an object with no duplicate values", t => {
+test("alterConflicting should return an object with no duplicate values", t => {
     let values = Object.keys(alteredInput).map(key => alteredInput[key]);
     t.true(values.filter(key => values.filter(el => el === key).length > 1).length === 0);
 });
-test.only("alterConflicting should return the proper output for prepared input", t => {
+test("alterConflicting should return the proper output for prepared input", t => {
     t.deepEqual(alteredInput, exp);
 });
 

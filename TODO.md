@@ -1,4 +1,3 @@
-* handle conflicting renames before showing confirmation dialog
 * make options window and options saving
 * show progress for file/dir reading
 * undo history stored along with settings?
