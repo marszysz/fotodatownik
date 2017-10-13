@@ -173,23 +173,31 @@ test.cb('dirRenameMap should include a non-enumerable baseDir property', t => {
 const alterConflicting = backend.__get__('alterConflicting');
 var input = {
     'abc': 'abcd',
+    'abcd': 'abcd',
     'def.jpg': 'def (1).jpg',
-    'def (1).jpg': 'blah',
-    'ghi.jpeg': 'blah',
-    'jkl.jpg': 'blah'
+    'def (1).jpg': 'blah.jpg',
+    'ghi.jpeg': 'blah.jpg',
+    'jkl.jpg': 'blah.jpg'
 };
 var exp = {
     'abc': 'abcd',
+    'abcd': 'abcd (2)',
     'def.jpg': 'def (1).jpg',
-    'def (1).jpg': 'blah',
-    'ghi.jpeg': 'blah (2)',
-    'jkl.jpg': 'blah (3)'
+    'def (1).jpg': 'blah.jpg',
+    'ghi.jpeg': 'blah (2).jpg',
+    'jkl.jpg': 'blah (3).jpg'
 };
-test("alterConflicting should return an object with the same keys as the input has", t => {
-    t.is(Object.keys(alterConflicting(input)), Object.keys(input));
+let alteredInput = alterConflicting(input);
+test.only("alterConflicting should return an object with the same keys as the input has", t => {
+    t.deepEqual(Object.keys(alteredInput), Object.keys(input));
 });
-test.todo("alterConflicting should return an object with no duplicate values");
-test.todo("alterConflicting should return the proper output for prepared input");
+test.only("alterConflicting should return an object with no duplicate values", t => {
+    let values = Object.keys(alteredInput).map(key => alteredInput[key]);
+    t.true(values.filter(key => values.filter(el => el === key).length > 1).length === 0);
+});
+test.only("alterConflicting should return the proper output for prepared input", t => {
+    t.deepEqual(alteredInput, exp);
+});
 
 // let the execution testing begin
 const fileExists = function (fn) {
