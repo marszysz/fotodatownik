@@ -3,6 +3,7 @@
 module.exports = {fileRenameMap, dirRenameMap, renameFiles};
 
 const fs = require ('graceful-fs');
+const path = require('path');
 const exifParser = require('exif-parser');
 const moment = require('moment');
 
@@ -393,9 +394,9 @@ function alterConflicting (renameMap) {
         let [src, dest] = entry;
         let destOrd = targetSources[dest].indexOf(src);
         let ordInd = destOrd === 0 ? '' : ` (${destOrd + 1})`;
-        return [src, dest + ordInd];
-
-        // if(/\(\d\)(\.\w+)?/.test(dest)) {
+        let {name, ext} = path.parse(dest);
+        let destResolved = name + ordInd + ext;
+        return [src, destResolved];
     });
 }
 
