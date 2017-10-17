@@ -51,7 +51,7 @@ function openDialogWindow () {
         parent: remote.getCurrentWindow(),
         modal: true
     });
-    dialogWindow.loadURL(`file://${__dirname}/conf_dialog.html`);
+    dialogWindow.loadURL(`file://${__dirname}/confirm_dialog.html`);
     return dialogWindow;
 }
 
