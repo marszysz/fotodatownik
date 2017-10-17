@@ -33,6 +33,16 @@ function renameDirs () {
     }
 }
 
+document.getElementById('openSettings').addEventListener('click', openSettings);
+function openSettings () {
+    var dialogWindow = new remote.BrowserWindow({
+        width: 700,
+        height: 850,
+        parent: remote.getCurrentWindow()
+    });
+    dialogWindow.loadURL(`file://${__dirname}/settings.html`);
+}
+
 function selectDir () {
     var resp = remote.dialog.showOpenDialog(
         remote.getCurrentWindow(),

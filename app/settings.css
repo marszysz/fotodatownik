@@ -1,0 +1,24 @@
+@import url('index.css');
+
+fieldset {
+    padding-bottom: 0;
+    padding-top: 0;
+    margin: 0 0 1rem 0;
+}
+
+fieldset > p {
+    margin: 1.2em 0;
+}
+
+p > label {
+    display: inline-block;
+    margin-bottom: 0.6ex;
+}
+
+input {
+    padding-left: 0.5ch;
+}
+
+input#dayStart {
+    width: 5ch;
+}
