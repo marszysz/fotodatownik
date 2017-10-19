@@ -4,6 +4,7 @@ import test from 'ava';  // AVA insists on ES6 export/import
  
 const rewire = require('rewire');
 const backend = rewire('./backend');
+const config = rewire('./config');
 const fs = require('graceful-fs');
 
 var listFiles = backend.__get__('listFiles');
@@ -242,3 +243,11 @@ test.cb("renameFiles should rename files, but only if the target doesn't exist",
 test.cb("renameFiles should also rename directories the same way",
         testRename, 'e', 'e.renamed'); // directory
 
+// 
+// ----------=====  config.js  =====----------
+// 
+var DEFAULTS = config.__get__('DEFAULTS');
+var getSettings = config.__get__('getSettings');
+test("getSettings should return defaults when given a non-existing  path", t => {
+    t.deepEqual(getSettings('does/not/exists'), DEFAULTS);
+});
