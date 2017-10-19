@@ -175,18 +175,18 @@ const alterConflicting = backend.__get__('alterConflicting');
 var input = {
     'abc': 'abcd',
     'abcd': 'abcd',
-    'def.jpg': 'def (1).jpg',
-    'def (1).jpg': 'blah.jpg',
+    'def.jpg': 'def #1.jpg',
+    'def #1.jpg': 'blah.jpg',
     'ghi.jpeg': 'blah.jpg',
     'jkl.jpg': 'blah.jpg'
 };
 var exp = {
     'abc': 'abcd',
-    'abcd': 'abcd (2)',
-    'def.jpg': 'def (1).jpg',
-    'def (1).jpg': 'blah.jpg',
-    'ghi.jpeg': 'blah (2).jpg',
-    'jkl.jpg': 'blah (3).jpg'
+    'abcd': 'abcd #2',
+    'def.jpg': 'def #1.jpg',
+    'def #1.jpg': 'blah.jpg',
+    'ghi.jpeg': 'blah #2.jpg',
+    'jkl.jpg': 'blah #3.jpg'
 };
 let alteredInput = alterConflicting(input);
 test("alterConflicting should return an object with the same keys as the input has", t => {
