@@ -43,7 +43,7 @@ function saveSettings (settingsObj, fn=settingsFile) {
     let settings = Object.assign({}, getSettings(fn), settingsObj);
     let out = null;
     try {
-        fs.writeFileSync(JSON.stringify(settings));
+        fs.writeFileSync(fn, JSON.stringify(settings), 'utf8');
     } catch (e) {
         console.warn('Error writing settings file.');
         out = e;

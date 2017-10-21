@@ -251,3 +251,31 @@ var getSettings = config.__get__('getSettings');
 test("getSettings should return defaults when given a non-existing  path", t => {
     t.deepEqual(getSettings('does/not/exists'), DEFAULTS);
 });
+const settingsObj = {
+    a: 'b',
+    c: ['d', 'e', {f: true}]
+};
+test.cb("getSettings should return a proper settings object", t => {
+    const tmpfile = 'testdir-exec/tmpgettest.json';
+    fs.writeFile(tmpfile, JSON.stringify(settingsObj), 'utf8', () => {
+        t.deepEqual(getSettings(tmpfile), settingsObj);
+        t.end();
+        fs.unlink(tmpfile, e => e && console.warn(e.message));
+    });
+});
+var saveSettings = config.__get__('saveSettings');
+test.cb("saveSettings should save a JSON file with expected contents", t => {
+    const tmpfile = 'testdir-exec/tmpsavetest.json';
+    saveSettings(settingsObj, tmpfile);  // saveSettings is synchronous
+    fs.readFile(tmpfile, 'utf8', (err, data) => {
+        if(err) console.warn('error: ', err.message);
+        try {
+            t.deepEqual(JSON.parse(data), Object.assign({}, DEFAULTS, settingsObj));
+        }
+        catch (e) {
+            t.fail(`unreadable settings: ${e.message}`);
+        }
+        t.end();
+        fs.unlink(tmpfile, e => e && console.warn(e.message));
+    });
+});
