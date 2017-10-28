@@ -25,6 +25,7 @@
     "extends": "plugin:ava/recommended"
   },
   "dependencies": {
+    "deepmerge": "^2.0.0",
     "exif-parser": "^0.1.12",
     "graceful-fs": "^4.1.11",
     "htmlspecialchars": "^1.0.5",

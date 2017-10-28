@@ -2,6 +2,7 @@
 
 const fs = require('graceful-fs');
 const path = require('path');
+const deepmerge = require('deepmerge');
 
 const defaultSettingsFile = 'fotodatownik.json';
 const DEFAULTS = {
@@ -22,7 +23,7 @@ const DEFAULTS = {
 module.exports = {DEFAULTS, getSettings, saveSettings};
 
 function getUserHome() {
-    return process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+    return process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
 }
 const settingsFile = path.join(getUserHome(), defaultSettingsFile);
 
@@ -40,7 +41,7 @@ function getSettings (fn=settingsFile) {
 }
 
 function saveSettings (settingsObj, fn=settingsFile) {
-    let settings = Object.assign({}, getSettings(fn), settingsObj);
+    let settings = deepmerge(getSettings(fn), settingsObj);
     let out = null;
     try {
         fs.writeFileSync(fn, JSON.stringify(settings), 'utf8');

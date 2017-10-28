@@ -6,6 +6,7 @@ const rewire = require('rewire');
 const backend = rewire('./backend');
 const config = rewire('./config');
 const fs = require('graceful-fs');
+const deepmerge = require('deepmerge');
 
 var listFiles = backend.__get__('listFiles');
 test('listFiles should return proper file list filtered by the supplied function', t => {
@@ -253,7 +254,11 @@ test("getSettings should return defaults when given a non-existing  path", t => 
 });
 const settingsObj = {
     a: 'b',
-    c: ['d', 'e', {f: true}]
+    c: ['d', 'e', {f: true}],
+    files: {
+        dateSeparator: '!',
+        bla: 'blah'
+    }
 };
 test.cb("getSettings should return a proper settings object", t => {
     const tmpfile = 'testdir-exec/tmpgettest.json';
@@ -270,7 +275,7 @@ test.cb("saveSettings should save a JSON file with expected contents", t => {
     fs.readFile(tmpfile, 'utf8', (err, data) => {
         if(err) console.warn('error: ', err.message);
         try {
-            t.deepEqual(JSON.parse(data), Object.assign({}, DEFAULTS, settingsObj));
+            t.deepEqual(JSON.parse(data), deepmerge(DEFAULTS, settingsObj));
         }
         catch (e) {
             t.fail(`unreadable settings: ${e.message}`);
