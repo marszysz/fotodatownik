@@ -63,6 +63,7 @@
             "request": "attach",
             "port": 9223,
             "webRoot": "${workspaceRoot}",
+            "sourceMaps": false,
             "timeout": 30000
         }
     ],
