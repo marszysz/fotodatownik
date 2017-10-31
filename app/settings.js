@@ -2,7 +2,9 @@
 
 const remote = require('electron').remote;
 const deepmerge = require('deepmerge');
+const moment = require('moment');
 const config = require('../config');
+const backend = require('../backend');
 
 let settingWidgets = Array.from(document.querySelectorAll('[data-setting]'));
 
@@ -19,6 +21,25 @@ function saveClose () {
 }
 
 deploySettings(config.getSettings(), settingWidgets);
+makePreviews();
+
+settingWidgets.forEach(el => {
+    el.addEventListener('change', makePreviews);
+    el.addEventListener('keyup', makePreviews);
+});
+function makePreviews () {
+    let fPrev = document.getElementById('filesPreview');
+    let dPrev = document.getElementById('dirsPreview');
+    fPrev.value = backend.makeNewFileName(' ', new Date(), collectSettings(settingWidgets)['files']);
+    dPrev.value = backend.makeNewDirName(
+        ' ',
+        [
+            new Date(),
+            moment(new Date()).add(32, 'days').toDate()
+        ],
+        collectSettings(settingWidgets)['dirs']
+    );
+}
 
 function collectSettings(settingWidgets) {
     function getValue(elem) {
