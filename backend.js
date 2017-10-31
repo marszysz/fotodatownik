@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = {fileRenameMap, dirRenameMap, renameFiles};
+module.exports = {fileRenameMap, dirRenameMap, renameFiles, makeNewFileName, makeNewDirName};
 
 const fs = require ('graceful-fs');
 const path = require('path');
