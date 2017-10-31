@@ -36,7 +36,7 @@ function renameDirs () {
 document.getElementById('openSettings').addEventListener('click', openSettings);
 function openSettings () {
     var dialogWindow = new remote.BrowserWindow({
-        width: 700,
+        width: 800,
         height: 850,
         parent: remote.getCurrentWindow()
     });

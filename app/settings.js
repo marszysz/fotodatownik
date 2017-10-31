@@ -14,11 +14,17 @@ document.getElementById('saveSettings').addEventListener('click', saveClose);
 function saveClose () {
     let settingsObj = buildSettingsObj(document.getElementById('main'));
     config.saveSettings(settingsObj);
+    // remote.getCurrentWindow().close();
+    console.log(settingsObj);
 }
 
+// autorze, nie idź tą drogą...
+// branch jest do wywalenia, albo trzeba zmienić te funkcje poniżej na prostsze:
+// zamiast polegać na hierarchicznej strukturze pliku settings.html, lepiej zrobić
+// płaskie atrybuty data-setting z hierarchicznymi wartościami ("file.dateSeparator" itd.)
+// Zaprawdę, słuszność ma Rossum: "flat is better than nested", czy jakoś tak.
 function buildSettingsObj(parent) {
     function getValue(elem) {
-        if(elem.tagName !== 'input') return null;
         return elem.hasAttribute('checked')
             ? elem.getAttribute('checked')
             : elem.getAttribute('value');
@@ -45,13 +51,20 @@ function deploySettings (settingsObj, container) {
         }
     }
     Object.keys(settingsObj).forEach(key => {
-        let subKeys = Object.keys(settingsObj[key]);
-        let targetElem = container.querySelector(`input[data-setting="${key}"]`);
-        if(subKeys.length === 0) {
-            setValue(targetElem, settingsObj[key]);
+        let subSetting = settingsObj[key];
+        let targetElem = container.querySelector(`[data-setting="${key}"]`);
+        let elemType;
+        try {
+            elemType = targetElem.tagName;
         }
-        else {
-            deploySettings(subKeys, targetElem);
+        catch (e) {
+            elemType = null;
+        }
+        if(elemType === 'INPUT') {
+            setValue(targetElem, subSetting);
+        }
+        else if (elemType) {
+            deploySettings(subSetting, targetElem);
         }
     });
 }
