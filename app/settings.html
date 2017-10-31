@@ -7,52 +7,52 @@
 </head> 
 <body>
     <div id="main">
-        <fieldset data-setting="files">
+        <fieldset>
             <legend>Datowanie zdjęć</legend>
             <p>
                 <label for="fDateSeparator">Separator daty:</label>
-                <input type="text" id="fDateSeparator" data-setting="dateSeparator" size="5" maxlength="5">
+                <input type="text" id="fDateSeparator" data-setting="files.dateSeparator" size="5" maxlength="5">
                 <br> Tekst rozdzielający miesiąc od roku i dnia. Może być pusty, domyślnie: kreska (minus).
             </p>
             <p>
                 <label for="timeSeparator">Separator czasu:</label>
-                <input type="text" id="timeSeparator" data-setting="timeSeparator" size="5" maxlength="5">
+                <input type="text" id="timeSeparator" data-setting="files.timeSeparator" size="5" maxlength="5">
                 <br>Tekst rozdzielający minuty od godziny i sekund. Może być pusty, domyślnie: kropka.
             </p>
             <p>
                 <label for="dateTimeSeparator">Separator pomiędzy datą a godziną:</label>
-                <input type="text" id="dateTimeSeparator" data-setting="dateTimeSeparator" size="10" maxlength="10">
+                <input type="text" id="dateTimeSeparator" data-setting="files.dateTimeSeparator" size="10" maxlength="10">
                 <br>Tekst rozdzielający datę od godziny. Może być pusty, domyślnie: spacja.
             </p>
             <p>
-                <label for="preview">Podgląd:</label>
-                <input type="text" id="fPreview" disabled>
+                <label for="filesPreview">Podgląd:</label>
+                <input type="text" id="filesPreview" disabled>
             </p>
         </fieldset>
-        <fieldset data-setting="dirs">
+        <fieldset>
             <legend>Datowanie katalogów</legend>
             <p>
                 <label for="dDateSeparator">Separator daty:</label>
-                <input type="text" id="dDateSeparator" data-setting="dateSeparator" size="5" maxlength="5">
+                <input type="text" id="dDateSeparator" data-setting="dirs.dateSeparator" size="5" maxlength="5">
                 <br>Tekst rozdzielający miesiąc od roku i dnia. Może być pusty, domyślnie: kropka.
             </p>
             <p>
                 <label for="rangeSeparator">Separator pomiędzy datami:</label>
-                <input type="text" id="rangeSeparator" data-setting="rangeSeparator" size="5" maxlength="5">
+                <input type="text" id="rangeSeparator" data-setting="dirs.rangeSeparator" size="5" maxlength="5">
                 <br>Tekst rozdzielający datę pierwszego zdjęcia w katalogu od drugiej daty - albo jej części.
                     Domyślnie: kreska (minus).
             </p>
 
             <p>
                 <label for="dayStart">Godzina początku dnia:</label>
-                <input type="number" id="dayStart" data-setting="dayStart" size="2" maxlength="2" min="0" max="23">:00
+                <input type="number" id="dayStart" data-setting="dirs.dayStart" size="2" maxlength="2" min="0" max="23">:00
                 <br>Godzina, którą program uważa za początek dnia.
                 Zdjęcia zrobione przed tą godziną traktowane są tak, jakby były zrobione poprzedniego dnia.
                 Przydaje się np. przy zdjęciach z imprez, które trwały dłużej niż do północy.
             </p>
                         <p>
-                <label for="dPreview">Podgląd:</label>
-                <input type="text" id="dPreview" disabled>
+                <label for="dirsPreview">Podgląd:</label>
+                <input type="text" id="dirsPreview" disabled>
             </p>
             <p>   
         </fieldset>

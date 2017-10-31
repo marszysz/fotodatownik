@@ -1,9 +1,10 @@
 'use strict';
 
 const remote = require('electron').remote;
+const deepmerge = require('deepmerge');
 const config = require('../config');
 
-deploySettings(config.getSettings(), document.getElementById('main'));
+let settingWidgets = Array.from(document.querySelectorAll('[data-setting]'));
 
 document.getElementById('cancelButton').addEventListener('click', closeMe);
 function closeMe () {
@@ -12,59 +13,34 @@ function closeMe () {
 
 document.getElementById('saveSettings').addEventListener('click', saveClose);
 function saveClose () {
-    let settingsObj = buildSettingsObj(document.getElementById('main'));
+    let settingsObj = collectSettings(settingWidgets);
     config.saveSettings(settingsObj);
-    // remote.getCurrentWindow().close();
-    console.log(settingsObj);
+    remote.getCurrentWindow().close();
 }
 
-// autorze, nie idź tą drogą...
-// branch jest do wywalenia, albo trzeba zmienić te funkcje poniżej na prostsze:
-// zamiast polegać na hierarchicznej strukturze pliku settings.html, lepiej zrobić
-// płaskie atrybuty data-setting z hierarchicznymi wartościami ("file.dateSeparator" itd.)
-// Zaprawdę, słuszność ma Rossum: "flat is better than nested", czy jakoś tak.
-function buildSettingsObj(parent) {
+deploySettings(config.getSettings(), settingWidgets);
+
+function collectSettings(settingWidgets) {
     function getValue(elem) {
-        return elem.hasAttribute('checked')
-            ? elem.getAttribute('checked')
-            : elem.getAttribute('value');
+        let valueField = elem.hasAttribute('checked') ? 'checked' : 'value';
+        return elem[valueField];
     }
-    let innerSettings = Array.from(parent.children).filter(el => el.hasAttribute('data-setting'));
-    let out = {};
-    innerSettings.forEach(el => {
-        let settingName = el.getAttribute('data-setting');
-        let subSettings = buildSettingsObj(el);
-        out[settingName] = subSettings === {} 
-            ? getValue(el)
-            : subSettings;
-    });
-    return out;
+    let settingsObj = deepmerge.all(settingWidgets.map(el => el
+        .getAttribute('data-setting')
+        .split('.')
+        .reduceRight((acc, currLvl) => ({[currLvl]: acc}), getValue(el))
+    ));
+    return settingsObj;
 }
 
-function deploySettings (settingsObj, container) {
+function deploySettings (settingsObj, settingWidgets) {
     function setValue(elem, value) {
-        if(elem.hasAttribute('checked')) {
-            elem.setAttribute('checked', value);
-        }
-        else {
-            elem.setAttribute('value', value);
-        }
+        let valueField = elem.hasAttribute('checked') ? 'checked' : 'value';
+        elem[valueField] = value;
     }
-    Object.keys(settingsObj).forEach(key => {
-        let subSetting = settingsObj[key];
-        let targetElem = container.querySelector(`[data-setting="${key}"]`);
-        let elemType;
-        try {
-            elemType = targetElem.tagName;
-        }
-        catch (e) {
-            elemType = null;
-        }
-        if(elemType === 'INPUT') {
-            setValue(targetElem, subSetting);
-        }
-        else if (elemType) {
-            deploySettings(subSetting, targetElem);
-        }
+    settingWidgets.forEach(el => {
+        let data = settingsObj;
+        let value = eval('data.' + el.getAttribute('data-setting'));
+        setValue(el, value);
     });
 }
