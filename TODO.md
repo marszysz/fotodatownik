@@ -1,4 +1,3 @@
-* make options window and options saving
 * show progress for file/dir reading
 * undo history stored along with settings?
 * find about possibility of cross-platform shell integration
