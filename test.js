@@ -79,6 +79,7 @@ test('makeNewFileName should compose a new file name based on the old name, file
         includeTitle: false
     };
     t.is(makeNewFileName('DCIM1234 sth.jpg', new Date('2016-01-01T00:00:00.999Z'), opts), '20160101-00:00:00.jpg');
+    t.is(makeNewFileName('ja 2014.02_paszport.jpg', new Date('2016-01-01T00:00:00.999Z'), opts), '20160101-00:00:00.jpg');
 });
 
 var fileRenameMap = backend.__get__('fileRenameMap');
@@ -173,7 +174,7 @@ test.cb('dirRenameMap should include a non-enumerable baseDir property', t => {
 });
 
 const alterConflicting = backend.__get__('alterConflicting');
-var input = {
+var inputFiles = {
     'abc': 'abcd',
     'abcd': 'abcd',
     'def.jpg': 'def #1.jpg',
@@ -181,7 +182,7 @@ var input = {
     'ghi.jpeg': 'blah.jpg',
     'jkl.jpg': 'blah.jpg'
 };
-var exp = {
+var expFiles = {
     'abc': 'abcd',
     'abcd': 'abcd #2',
     'def.jpg': 'def #1.jpg',
@@ -189,16 +190,33 @@ var exp = {
     'ghi.jpeg': 'blah #2.jpg',
     'jkl.jpg': 'blah #3.jpg'
 };
-let alteredInput = alterConflicting(input);
+var inputDirs = {
+    'abc': 'abcd',
+    'abcd': 'abcd',
+    '1980.05.01': '1980.05.01',
+    'blah': '1980.05.01'
+};
+var expDirs = {
+    'abc': 'abcd',
+    'abcd': 'abcd #2',
+    '1980.05.01': '1980.05.01',
+    'blah': '1980.05.01 #2'
+};
+let alteredInputFiles = alterConflicting(inputFiles, 'file');
+let alteredInputDirs = alterConflicting(inputDirs, 'dir');
 test("alterConflicting should return an object with the same keys as the input has", t => {
-    t.deepEqual(Object.keys(alteredInput), Object.keys(input));
+    t.deepEqual(Object.keys(alteredInputFiles), Object.keys(inputFiles));
+    t.deepEqual(Object.keys(alteredInputDirs), Object.keys(inputDirs));
 });
 test("alterConflicting should return an object with no duplicate values", t => {
-    let values = Object.keys(alteredInput).map(key => alteredInput[key]);
-    t.true(values.filter(key => values.filter(el => el === key).length > 1).length === 0);
+    let valuesF = Object.keys(alteredInputFiles).map(key => alteredInputFiles[key]);
+    t.true(valuesF.filter(key => valuesF.filter(el => el === key).length > 1).length === 0);
+    let valuesD = Object.keys(alteredInputDirs).map(key => alteredInputDirs[key]);
+    t.true(valuesD.filter(key => valuesD.filter(el => el === key).length > 1).length === 0);
 });
 test("alterConflicting should return the proper output for prepared input", t => {
-    t.deepEqual(alteredInput, exp);
+    t.deepEqual(alteredInputFiles, expFiles);
+    t.deepEqual(alteredInputDirs, expDirs);
 });
 
 // let the execution testing begin
