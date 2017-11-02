@@ -202,8 +202,8 @@ var expDirs = {
     '1980.05.01': '1980.05.01',
     'blah': '1980.05.01 #2'
 };
-let alteredInputFiles = alterConflicting(inputFiles, 'file');
-let alteredInputDirs = alterConflicting(inputDirs, 'dir');
+let alteredInputFiles = alterConflicting(inputFiles);
+let alteredInputDirs = alterConflicting(inputDirs, 'dirMode');
 test("alterConflicting should return an object with the same keys as the input has", t => {
     t.deepEqual(Object.keys(alteredInputFiles), Object.keys(inputFiles));
     t.deepEqual(Object.keys(alteredInputDirs), Object.keys(inputDirs));
