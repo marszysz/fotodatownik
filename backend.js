@@ -126,7 +126,7 @@ function makeNewFileName (oldFileName, fileDate, options) {
 
     function compose (src) {
         if(options.hasOwnProperty('includeTitle') && ! options.includeTitle) {
-            let fileExt = src.title.match(/\..+?$/g);
+            let fileExt = src.title.match(/\.[^.]+?$/g);
             src.title = fileExt ? fileExt[0] : '';
         }
         return [
