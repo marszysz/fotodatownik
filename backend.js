@@ -380,14 +380,18 @@ function dirRenameMap (outerDir, options, callback) {
         Object.keys(dirDateMap).forEach(dirName => {
             dirRenameMap[dirName] = makeNewDirName(dirName, dirDateMap[dirName], options);
         });
-        var finalDirRenameMap = alterConflicting(util.filterObject(dirRenameMap, fn => fn !== dirRenameMap[fn]));
+        var finalDirRenameMap = alterConflicting(
+            util.filterObject(dirRenameMap, fn => fn !== dirRenameMap[fn]),
+            'dirMode'
+        );
         Object.defineProperty(finalDirRenameMap, 'baseDir', {value: outerDir, enumerable: false});        
         callback(finalDirRenameMap);
     }
 }
 
-// Handles conflicting renames by adding (n) counter to the conflicting filenames
-function alterConflicting (renameMap) {
+// Handles conflicting renames by adding #counter to the conflicting filenames/dirnames.
+// Truthy dirMode argument indicates if the dir mode should be used, which ignores extension.
+function alterConflicting (renameMap, dirMode=false) {
     let targetSources = util.valueOccurences(renameMap);
 
     return util.mapObject(renameMap, entry => {
@@ -396,7 +400,7 @@ function alterConflicting (renameMap) {
         let destOrd = targetSources[dest].indexOf(src);
         let ordInd = destOrd === 0 ? '' : ` #${destOrd + 1}`;
         let {name, ext} = path.parse(dest);
-        let destResolved = name + ordInd + ext;
+        let destResolved = dirMode ? name + ext + ordInd : name + ordInd + ext;
         return [src, destResolved];
     });
 }
