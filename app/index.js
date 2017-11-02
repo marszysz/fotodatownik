@@ -4,18 +4,27 @@ const remote = require('electron').remote;
 const backend = require('../backend');
 const util = require('../util');
 const path = require('path');
+const config = require('../config');
+
+const fileTitlesChk = document.getElementById('fileTitles');
+fileTitlesChk.addEventListener('change', ev => {
+    config.saveSettings({files: {includeTitle: ev.target.checked}});
+});
+fileTitlesChk.checked = config.getSettings().files.includeTitle;
+
+const dirTitlesChk = document.getElementById('dirTitles');
+dirTitlesChk.addEventListener('change', ev => {
+    config.saveSettings({dirs: {includeTitle: ev.target.checked}});
+});
+dirTitlesChk.checked = config.getSettings().dirs.includeTitle;
 
 document.getElementById('renameFiles').addEventListener('click', renameFiles);
 function renameFiles () {
     var dir = selectDir();
     if (dir) {
-        var opts = {
-            dateSeparator: '-',
-            timeSeparator: '.',
-            dateTimeSeparator: ' '
-        };
-        opts.includeTitle = document.getElementById('fileTitles').checked;
-        backend.fileRenameMap(dir, fn => /\.jpe?g$/i.test(fn), opts, confirmRename);
+        var opts = config.getSettings().files;
+        var filter = fn => /\.jpe?g$/i.test(fn);
+        backend.fileRenameMap(dir, filter, opts, confirmRename);
     }
 }
 
@@ -23,12 +32,7 @@ document.getElementById('renameDirs').addEventListener('click', renameDirs);
 function renameDirs () {
     var dir = selectDir();
     if (dir) {
-        var opts = {
-            dateSeparator: '.',
-            rangeSeparator: '-',
-            dayStart: 0
-        };
-        opts.includeTitle = document.getElementById('dirTitles').checked;
+        var opts = config.getSettings().dirs;
         backend.dirRenameMap(dir, opts, confirmRename);
     }
 }
@@ -37,7 +41,7 @@ document.getElementById('openSettings').addEventListener('click', openSettings);
 function openSettings () {
     var dialogWindow = new remote.BrowserWindow({
         width: 800,
-        height: 850,
+        height: 690,
         parent: remote.getCurrentWindow()
     });
     dialogWindow.loadURL(`file://${__dirname}/settings.html`);
