@@ -439,8 +439,3 @@ function renameFiles (baseDir, renameMap, callback) {
         }
     }
 }
-
-// TODO: what about *.thm files and associated objects, especially videos?
-// Also, videos without *.thm files, having their dates only in fs attributes...
-
-// TODO: suspicious cases (very old dates, subdirs containing both photos and another subdirs)
