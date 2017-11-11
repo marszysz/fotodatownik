@@ -1,6 +1,9 @@
 # my specific files ;)
 killme*
 
+# distributable packages
+dist
+
 # Logs
 logs
 *.log

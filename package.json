@@ -1,22 +1,72 @@
 {
   "name": "fotodatownik",
-  "version": "1.0.0",
+  "version": "1.0.1-beta",
   "description": "Apka do ustawiania nazw plików i katalogów wg dat w kolekcjach jpeg-ów",
+  "author": "Marcin Szyszko <marszysz@g_mail.com>",
+  "license": "MIT",
+  "private": true,
+  "homepage": "https://github.com/marszysz/fotodatownik",
   "main": "main.js",
   "scripts": {
     "test": "ava",
-    "start": "electron ."
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder -lwm --x64 --ia32",
+    "postdist": "node ./dist-cleanup.js"
   },
-  "author": "Marcin",
-  "license": "MIT",
-  "private": true,
+  "build": {
+    "appId": "com.electron.fotodatownik",
+    "files": [
+      "!testdir*",
+      "!test.js",
+      "!**/.vscode",
+      "!**/.eslintrc",
+      "!**/.jshintrc",
+      "!debug.js",
+      "!jsconfig.json"
+    ],
+    "linux": {
+      "category": "Graphics",
+      "target": [
+        {
+          "target": "AppImage"
+        },
+        {
+          "target": "deb"
+        },
+        {
+          "target": "rpm"
+        },
+        {
+          "target": "zip"
+        }
+      ]
+    },
+    "win": {
+      "target": [
+        "zip"
+      ]
+    },
+    "mac": {
+      "category": "public.app-category.photography",
+      "target": [
+        "tar.gz"
+      ]
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marszysz/fotodatownik.git"
+  },
   "devDependencies": {
     "ava": "^0.22.0",
     "electron": "~1.7.5",
+    "electron-builder": "^19.45.1",
     "electron-reload": "^1.2.1",
     "eslint": "^4.5.0",
     "eslint-plugin-ava": "^4.2.2",
-    "rewire": "^2.5.2"
+    "rewire": "^2.5.2",
+    "rimraf": "^2.6.2"
   },
   "eslintConfig": {
     "plugins": [
@@ -26,6 +76,7 @@
   },
   "dependencies": {
     "deepmerge": "^2.0.0",
+    "electron-is-dev": "^0.3.0",
     "exif-parser": "^0.1.12",
     "graceful-fs": "^4.1.11",
     "htmlspecialchars": "^1.0.5",

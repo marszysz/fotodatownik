@@ -1,8 +1,8 @@
 'use strict';
 const electron = require('electron');
 const app = electron.app;
-
-require('electron-reload')(__dirname);
+const isDev = require('electron-is-dev');
+if(isDev) require('electron-reload')(__dirname);
 
 // prevent window being garbage collected
 let mainWindow;
